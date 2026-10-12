@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+<title>Calcula tu envío · TIPSA Granada Centro</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style id="estilos">
+/* Layout: una columna tipo albarán con tarjetas en corchete (logo TIPSA); panel de tarifas solo para el dueño */
+:root {
+  /* colores corporativos TIPSA: azul marino #13225b y naranja #e84e0f */
+  --bg: #eef0f6; --paper: #ffffff; --ink: #13225b; --muted: #55607a; --line: #dde1ec; --field: #f6f7fb;
+  --accent: #13225b; --accent-ink: #ffffff; --accent-soft: #e6e9f4;
+  --tape: #e84e0f; --tape-ink: #ffffff;
+  --ok: #1f7a4d; --warn: #9a5b00; --warn-soft: #fff4dc; --bad: #b42318; --bad-soft: #fde8e6;
+  --f-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141a; --paper: #18202a; --ink: #e8edf2; --muted: #9aa7b5; --line: #2a3440; --field: #121920;
+  --accent: #8fa3e8; --accent-ink: #0c1430; --accent-soft: #1d2747;
+  --tape: #ff6a2b; --tape-ink: #ffffff;
+  --ok: #5cc68f; --warn: #f0b456; --warn-soft: #3a2d14; --bad: #f08a80; --bad-soft: #3d2220; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f141a; --paper: #18202a; --ink: #e8edf2; --muted: #9aa7b5; --line: #2a3440; --field: #121920;
+  --accent: #8fa3e8; --accent-ink: #0c1430; --accent-soft: #1d2747;
+  --tape: #ff6a2b; --tape-ink: #ffffff;
+  --ok: #5cc68f; --warn: #f0b456; --warn-soft: #3a2d14; --bad: #f08a80; --bad-soft: #3d2220; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.45; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: grid; gap: 18px; }
+.wrap.ancho { max-width: 1100px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--tape); outline-offset: 2px; }
+
+/* Cabecera */
+header { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 4px solid var(--tape); }
+.cab-fila { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.logo { display: block; width: 150px; max-width: 45%; height: auto; background: #ffffff; border-radius: 8px; padding: 4px; margin-bottom: 4px; }
+.agencia { display: grid; gap: 2px; font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.agencia .direccion { font-size: 13px; text-transform: none; letter-spacing: 0; font-weight: 600; }
+.agencia small { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.05; margin: 0; letter-spacing: -0.5px; text-wrap: balance; color: var(--accent); }
+h1 span { background: linear-gradient(transparent 58%, var(--tape) 58%, var(--tape) 92%, transparent 92%); }
+.sub { color: var(--muted); margin: 0; max-width: 60ch; }
+.btn-admin { border: 2px solid var(--accent); background: var(--paper); color: var(--accent); font-weight: 700; padding: 8px 14px; border-radius: 0; }
+.btn-admin:hover { background: var(--accent-soft); }
+
+/* Tarjetas con el formato del logo TIPSA: esquinas en corchete naranja */
+.bloque, .op, .admin {
+  --esq: var(--tape); --grosor: 7px; --largo: 34px; --fondo: var(--paper);
+  border: 0; border-radius: 0; box-shadow: inset 0 0 0 1px var(--line);
+  background:
+    linear-gradient(var(--esq), var(--esq)) left top / var(--largo) var(--grosor) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) left top / var(--grosor) var(--largo) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right top / var(--largo) var(--grosor) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right top / var(--grosor) var(--largo) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) left bottom / var(--largo) var(--grosor) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) left bottom / var(--grosor) var(--largo) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right bottom / var(--largo) var(--grosor) no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right bottom / var(--grosor) var(--largo) no-repeat,
+    var(--fondo);
+}
+.bloque { padding: 22px; display: grid; gap: 14px; min-width: 0; }
+.bloque h2 { font-family: var(--f-display); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0; display: flex; align-items: center; gap: 10px; color: var(--accent); }
+.bloque h2 b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--tape); color: var(--tape-ink); font-size: 13px; }
+
+.campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+label.campo { display: grid; gap: 4px; font-size: 14px; font-weight: 600; min-width: 0; }
+input[type=text], input[type=number], select { width: 100%; min-width: 0; background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 16px; }
+input[type=number] { font-variant-numeric: tabular-nums; }
+.zona { font-size: 14px; color: var(--muted); }
+.zona strong { color: var(--ink); }
+.pill { display: inline-block; padding: 1px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; }
+.cruzada { background: var(--accent-soft); color: var(--accent); margin: 0; padding: 10px 14px; font-size: 14px; border-left: 4px solid var(--tape); }
+
+/* Bultos */
+.bultos { display: grid; gap: 10px; }
+.bulto { display: grid; grid-template-columns: 34px repeat(5, minmax(0, 1fr)) 36px; gap: 8px; align-items: end; padding: 10px; border: 1px dashed var(--line); border-radius: 10px; }
+.bulto .n { font-family: var(--f-display); font-weight: 800; font-size: 18px; color: var(--muted); align-self: center; text-align: center; }
+.bulto label { display: grid; gap: 3px; font-size: 12px; color: var(--muted); font-weight: 600; min-width: 0; }
+.bulto input { padding: 8px; }
+.quitar { border: 0; background: transparent; color: var(--muted); border-radius: 8px; height: 40px; font-size: 18px; }
+.quitar:hover { background: var(--bad-soft); color: var(--bad); }
+.info-bulto { grid-column: 2 / -1; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.info-bulto.aviso { color: var(--warn); }
+.info-bulto.error { color: var(--bad); font-weight: 600; }
+.anadir { justify-self: start; border: 1px solid var(--tape); color: var(--tape); background: transparent; border-radius: 8px; padding: 8px 16px; font-weight: 600; }
+.anadir:hover { background: var(--accent-soft); }
+@media (max-width: 600px) {
+  .bulto { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bulto .n { grid-column: 1 / 3; text-align: left; }
+  .bulto .quitar { grid-column: 3; grid-row: 1; justify-self: end; }
+  .info-bulto { grid-column: 1 / -1; }
+}
+
+/* Resumen y opciones */
+.etiqueta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); border: 2px solid var(--accent); overflow: hidden; }
+.etiqueta div { padding: 10px 14px; border-right: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
+.etiqueta div:last-child { border-right: 0; }
+.etiqueta span { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 700; }
+.etiqueta strong { font-family: var(--f-display); font-size: 20px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.opciones { display: grid; gap: 12px; }
+.op { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 14px 16px; position: relative; --largo: 26px; --grosor: 5px; }
+.op.mejor { --largo: 32px; --grosor: 7px; --fondo: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--tape); }
+.op .cinta { position: absolute; top: -11px; left: 36px; background: var(--tape); color: var(--tape-ink); font-size: 12px; font-weight: 700; padding: 1px 10px; text-transform: uppercase; letter-spacing: .6px; }
+.op h3 { margin: 0; font-family: var(--f-display); font-size: 19px; font-weight: 700; }
+.op .plazo { color: var(--muted); font-size: 14px; }
+.op .precio { grid-row: 1 / span 2; grid-column: 2; text-align: right; font-variant-numeric: tabular-nums; }
+.op .precio strong { display: block; font-family: var(--f-display); font-size: 28px; font-weight: 800; line-height: 1.05; }
+.op .precio small { color: var(--muted); font-size: 13px; }
+.op ul { grid-column: 1 / -1; margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--muted); }
+.vacio { color: var(--muted); margin: 0; }
+.alerta { background: var(--bad-soft); color: var(--bad); border-radius: 10px; padding: 12px 14px; font-weight: 600; }
+.nota-dest { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 14px; font-size: 14px; margin: 0; }
+.nota-agencia { margin: 0; font-size: 14px; color: var(--accent); border-top: 1px solid var(--line); padding-top: 12px; }
+.nota-agencia strong { font-weight: 700; }
+
+.contacto { background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline; font-size: 15px; }
+.contacto strong { font-family: var(--f-display); }
+.contacto .dato { user-select: all; font-weight: 600; font-variant-numeric: tabular-nums; }
+footer { font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
+footer p { margin: 0; }
+
+/* Encargo */
+.formas { display: flex; flex-wrap: wrap; gap: 10px; }
+.forma { display: inline-flex; align-items: center; justify-content: center; padding: 12px 18px; font-weight: 700; text-decoration: none; border: 0; font-size: 16px; min-width: 180px; }
+.forma.wa { background: #1f8f4e; color: #ffffff; }
+.forma.mail { background: var(--accent); color: var(--accent-ink); }
+.forma.copiar { background: var(--paper); color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.forma[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+.pedido-txt { margin: 0; white-space: pre-wrap; font-family: var(--f-body); font-size: 14px; background: var(--field); padding: 12px 14px; color: var(--ink); border-left: 4px solid var(--tape); overflow-wrap: anywhere; }
+
+/* Panel de tarifas */
+/* Mismo aspecto que la calculadora: corchetes naranjas, títulos con círculo, azul marino TIPSA */
+.admin { padding: 24px; display: grid; gap: 16px; min-width: 0; }
+.admin h2 { margin: 0; font-family: var(--f-display); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+.admin h2::before { content: "€"; display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--tape); color: var(--tape-ink); font-size: 13px; }
+.admin p { margin: 0; }
+.admin .ayuda { color: var(--muted); font-size: 14px; max-width: 75ch; }
+.pendiente { background: var(--warn-soft); color: var(--warn); padding: 10px 14px; font-weight: 600; font-size: 14px; border-left: 4px solid var(--tape); }
+.pestanas { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 12px; border-bottom: 4px solid var(--tape); }
+.pestanas button { border: 0; background: var(--field); color: var(--accent); padding: 9px 14px; font-size: 14px; font-weight: 700; box-shadow: inset 0 0 0 1px var(--line); }
+.pestanas button:hover { background: var(--accent-soft); }
+.pestanas button.on { background: var(--accent); color: var(--accent-ink); box-shadow: inset 0 -4px 0 var(--tape); }
+.subida { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; background: var(--accent-soft); color: var(--accent); padding: 12px 14px; border-left: 4px solid var(--tape); }
+.subida input { width: 90px; background: var(--paper); }
+.tabla-scroll { overflow-x: auto; padding: 6px 14px 12px;
+  --esq: var(--tape); box-shadow: inset 0 0 0 1px var(--line);
+  background:
+    linear-gradient(var(--esq), var(--esq)) left top / 26px 5px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) left top / 5px 26px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right top / 26px 5px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right top / 5px 26px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) left bottom / 26px 5px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) left bottom / 5px 26px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right bottom / 26px 5px no-repeat,
+    linear-gradient(var(--esq), var(--esq)) right bottom / 5px 26px no-repeat, var(--paper); }
+.tabla-ed { border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 100%; }
+.tabla-ed caption { text-align: left; font-family: var(--f-display); font-weight: 700; font-size: 17px; padding: 10px 0 10px; color: var(--accent); }
+.tabla-ed th, .tabla-ed td { border-bottom: 1px solid var(--line); padding: 5px 8px; text-align: left; white-space: nowrap; }
+.tabla-ed thead th { background: var(--accent); color: var(--accent-ink); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; padding: 8px; }
+.tabla-ed thead th:first-child { background: var(--tape); }
+.tabla-ed tbody tr:nth-child(even) { background: var(--field); }
+.tabla-ed tbody th { font-weight: 700; color: var(--accent); }
+.tabla-ed input { width: 90px; padding: 7px 9px; font-size: 15px; text-align: right; border-radius: 8px; background: var(--paper); border: 1px solid var(--line); font-weight: 600; color: var(--accent); }
+.tabla-ed input:focus { border-color: var(--tape); }
+.tabla-ed input.texto { text-align: left; width: 120px; }
+.tabla-ed input.mal { border-color: var(--bad); background: var(--bad-soft); }
+.provs { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px 12px; font-size: 14px; background: var(--field); padding: 12px 14px; }
+.provs label { display: flex; gap: 6px; align-items: center; }
+.provs input { accent-color: var(--tape); width: 16px; height: 16px; }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding-top: 12px; border-top: 4px solid var(--tape); }
+.btn-pri { background: var(--tape); color: var(--tape-ink); border: 0; padding: 12px 22px; font-weight: 700; font-size: 16px; }
+.btn-sec { background: var(--paper); color: var(--accent); border: 0; box-shadow: inset 0 0 0 2px var(--accent); padding: 10px 18px; font-weight: 700; }
+.caja-panel { display: grid; gap: 12px; background: var(--field); padding: 16px 18px; border-left: 6px solid var(--tape); }
+.caja-panel h3, .paso-panel { margin: 0; font-family: var(--f-display); font-size: 17px; color: var(--accent); }
+.botones-tarifa { display: flex; flex-wrap: wrap; gap: 8px; }
+.botones-tarifa button { border: 0; background: var(--paper); color: var(--accent); padding: 10px 16px; font-weight: 700; box-shadow: inset 0 0 0 2px var(--accent); }
+.botones-tarifa button:hover { background: var(--accent-soft); }
+.botones-tarifa button.on { background: var(--tape); color: var(--tape-ink); box-shadow: none; }
+.botones-tarifa button.nueva { box-shadow: inset 0 0 0 2px var(--tape); color: var(--tape); }
+.tarifa-datos { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; font-size: 14px; }
+.tarifa-datos label { display: grid; gap: 4px; font-weight: 600; min-width: 220px; flex: 1 1 220px; }
+.tarifa-datos .codigo { color: var(--muted); }
+.btn-borrar { background: var(--paper); color: var(--bad); border: 0; box-shadow: inset 0 0 0 2px var(--bad); padding: 10px 16px; font-weight: 700; }
+.cliente-tarifa { margin: 0; justify-self: start; background: var(--tape); color: var(--tape-ink); font-weight: 700; padding: 6px 14px; font-size: 15px; }
+.estado-pub { font-size: 14px; color: var(--muted); }
+.estado-pub.mal { color: var(--bad); font-weight: 600; }
+.ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+</style>
+
+<div class="wrap" id="app">
+  <header>
+    <div class="cab-fila">
+      <div>
+        <img class="logo" alt="TIPSA" src="data:image/png;base64,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">
+        <div class="agencia">Agencia TIPSA Granada Centro 018000<span class="direccion">C/ Castilla y León, 7 · Pol. Navegrán · 18210 Peligros (Granada)</span><small>Lopal 2010, S.L.</small></div>
+      </div>
+      <button class="btn-admin" id="btnAdmin" type="button" hidden>Editar tarifas</button>
+    </div>
+    <h1>Calcula el precio de <span>tu envío</span></h1>
+    <p class="sub">Indica a dónde va y las medidas y el peso de cada bulto. Te mostramos el precio de cada servicio disponible. Por defecto recogemos en Granada; si sale de otro sitio, indícalo en Origen.</p>
+    <p class="cliente-tarifa" id="clienteTarifa" hidden></p>
+  </header>
+
+  <section class="admin" id="admin" aria-labelledby="t-admin" hidden>
+    <h2 id="t-admin">Panel de tarifas</h2>
+    <p class="ayuda">Solo tú ves este panel. Cambia los precios (sin IVA) y pulsa <strong>Guardar y publicar</strong>: tus clientes verán la tarifa nueva al momento, con el mismo enlace. Mientras editas, la calculadora de abajo ya usa los precios nuevos para que puedas probarlos.</p>
+    <p class="pendiente" id="pendiente" hidden>Tienes cambios sin publicar. Los clientes siguen viendo la tarifa anterior.</p>
+    <div class="caja-panel">
+      <h3>1 · Elige la tarifa</h3>
+      <p class="ayuda">La <strong>General</strong> es la que ve cualquiera con el enlace normal. Crea una tarifa para cada cliente que tenga precios especiales: cada una tiene su propio enlace.</p>
+      <div class="botones-tarifa" id="botonesTarifa"></div>
+      <div class="tarifa-datos" id="tarifaDatos"></div>
+    </div>
+    <h3 class="paso-panel">2 · Cambia los precios de esta tarifa</h3>
+    <div class="subida">
+      <span>Subir o bajar <strong>todos</strong> los precios un</span>
+      <input type="text" id="subidaPct" inputmode="decimal" placeholder="3,5" aria-label="Porcentaje">
+      <span>%</span>
+      <button class="btn-sec" id="subidaBtn" type="button">Aplicar</button>
+      <span class="estado-pub" id="subidaTxt"></span>
+    </div>
+    <div class="pestanas" id="pestanas" role="tablist"></div>
+    <div id="adminCont"></div>
+    <div class="acciones">
+      <button class="btn-pri" id="guardar" type="button">Guardar y publicar</button>
+      <button class="btn-sec" id="descartar" type="button">Descartar cambios</button>
+      <span class="estado-pub" id="estadoPub"></span>
+    </div>
+    <div class="caja-panel">
+      <h3>3 · Manda la calculadora con esta tarifa</h3>
+      <p class="ayuda" id="envAyuda"></p>
+      <div class="campos">
+        <label class="campo">Nombre del cliente (para el saludo)
+          <input type="text" id="envNombre">
+        </label>
+        <label class="campo">Teléfono (WhatsApp)
+          <input type="text" id="envTel" inputmode="tel" placeholder="Ej.: 600123456">
+        </label>
+        <label class="campo">Correo electrónico
+          <input type="text" id="envMail" inputmode="email" placeholder="cliente@empresa.com">
+        </label>
+      </div>
+      <div class="formas">
+        <a class="forma wa" id="envWa" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+        <a class="forma mail" id="envMailBtn" target="_blank" rel="noopener">Enviar por email</a>
+        <button class="forma copiar" id="envCopiar" type="button">Copiar enlace y mensaje</button>
+      </div>
+      <p class="estado-pub" id="envEstado"></p>
+      <pre class="pedido-txt" id="envTexto"></pre>
+    </div>
+  </section>
+
+  <section class="bloque" aria-labelledby="t-origen">
+    <h2 id="t-origen"><b>1</b>Origen</h2>
+    <div class="campos">
+      <label class="campo">Recogemos en
+        <select id="origenTipo">
+          <option value="gr">Granada (nuestra agencia)</option>
+          <option value="otro">Otro sitio</option>
+        </select>
+      </label>
+      <label class="campo" id="campoOrigCp" hidden>Código postal de recogida
+        <input type="text" id="origCp" inputmode="numeric" maxlength="5" placeholder="Ej.: 28001">
+      </label>
+      <label class="campo" id="campoOrigProv" hidden>o elige la provincia
+        <select id="origProv"></select>
+      </label>
+    </div>
+    <div class="zona" id="origenTxt"></div>
+    <p class="cruzada" id="cruzadaTxt" hidden></p>
+  </section>
+
+  <section class="bloque" aria-labelledby="t-destino">
+    <h2 id="t-destino"><b>2</b>Destino</h2>
+    <div class="campos">
+      <label class="campo">País
+        <select id="pais">
+          <option value="es">España</option>
+          <option value="pt">Portugal</option>
+        </select>
+      </label>
+      <label class="campo" id="campoCp">Código postal de destino
+        <input type="text" id="cp" inputmode="numeric" maxlength="5" placeholder="Ej.: 29001" autocomplete="postal-code">
+      </label>
+      <label class="campo" id="campoProv">o elige la provincia
+        <select id="prov"></select>
+      </label>
+      <label class="campo" id="campoIsla" hidden>Isla
+        <select id="isla"></select>
+      </label>
+      <label class="campo" id="campoPt" hidden>Zona
+        <select id="ptZona">
+          <option value="peninsular">Portugal peninsular</option>
+          <option value="islas">Madeira y Azores</option>
+        </select>
+      </label>
+    </div>
+    <div class="zona" id="zonaTxt"></div>
+  </section>
+
+  <section class="bloque" aria-labelledby="t-bultos">
+    <h2 id="t-bultos"><b>3</b>Bultos</h2>
+    <div class="bultos" id="bultos"></div>
+    <button class="anadir" id="anadir" type="button">+ Añadir otro bulto</button>
+  </section>
+
+  <section class="bloque" aria-labelledby="t-precio" aria-live="polite">
+    <h2 id="t-precio"><b>4</b>Precio</h2>
+    <div class="etiqueta" id="etiqueta"></div>
+    <div id="notaDest"></div>
+    <div class="opciones" id="opciones"></div>
+    <p class="nota-agencia"><strong>Precios de la agencia TIPSA 018000 Granada Centro</strong> (Lopal 2010, S.L.). Otras agencias TIPSA pueden aplicar tarifas distintas.</p>
+  </section>
+
+  <section class="bloque" aria-labelledby="t-pedido">
+    <h2 id="t-pedido"><b>5</b>Encarga tu envío</h2>
+    <p class="vacio">Elige el servicio, déjanos tus datos y mándanos el pedido por WhatsApp o por email. Te contestamos para confirmar la recogida.</p>
+    <div class="campos">
+      <label class="campo">Servicio
+        <select id="pedServicio"></select>
+      </label>
+      <label class="campo">Tu nombre o empresa
+        <input type="text" id="pedNombre" autocomplete="name">
+      </label>
+      <label class="campo">Teléfono de contacto
+        <input type="text" id="pedTel" inputmode="tel" autocomplete="tel">
+      </label>
+    </div>
+    <label class="campo">Dirección de recogida y comentarios (opcional)
+      <input type="text" id="pedNotas" placeholder="Calle, número, horario de recogida…">
+    </label>
+    <div class="formas">
+      <span class="formas" id="pedWa"></span>
+      <a class="forma mail" id="pedMail" target="_blank" rel="noopener">Enviar por email</a>
+      <button class="forma copiar" id="pedCopiar" type="button">Copiar el pedido</button>
+    </div>
+    <p class="estado-pub" id="pedEstado"></p>
+    <pre class="pedido-txt" id="pedTexto"></pre>
+  </section>
+
+  <div class="contacto">
+    <strong>¿Te lo enviamos?</strong>
+    <span>Teléfono <span class="dato">958 40 86 59</span></span>
+    <span>Correo <span class="dato">granada@tip-sa.com</span></span>
+  </div>
+
+  <footer>
+    <p id="validezTxt">Precios orientativos de la tarifa general de la agencia 018000.</p>
+    <p id="volTxt"></p>
+    <p>Internacional: TIPSA Classic Europe se cobra por bulto (máximo 31,5 kg) según el peso real e incluye combustible y seguro. Aéreo y Economy se cobran por envío con el mismo peso volumétrico; fuera de la Unión Europea, los aranceles e impuestos en destino los paga el destinatario.</p>
+    <p>Servicios adicionales (reembolso, seguro, entrega en sábado…) según la tarifa vigente. Pregúntanos.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="tarifa-json">{"general":{"iva":21,"divisor":4000,"irregular":20,"cruzada":3.75,"validez":"31 de diciembre de 2026","whatsapp":"638471939, 687834184, 685830959","email":"granada@tip-sa.com;antonio.granada@tip-sa.com","regional":["04","11","14","18","21","23","29","41"],"provincial":[]},"nacional":[{"nombre":"TIPSA 24-48","plazo":"Servicio económico: entrega en 24 h (máximo 48 h)","bandas":[2,5,10,15,20,25,30,35,40,45,50],"precios":{"provincial":[3.65,3.72,4.90,5.13,6.39,8.24,8.86,10.72,12.60,15.68,18.16],"regional":[4.63,5.92,6.25,6.87,7.82,8.85,10.37,12.90,15.42,17.96,20.48],"peninsular":[5.48,6.56,6.87,7.94,11.63,15.42,17.96,19.23,25.55,28.08,31.88]},"adic":{"provincial":0.43,"regional":0.55,"peninsular":0.62},"km":null,"notas":[]},{"nombre":"TIPSA 14","plazo":"Entrega preferentemente antes de las 14:00 h","bandas":[2,5,10],"precios":{"provincial":[4.42,5.54,6.71],"regional":[6.44,7.66,8.06],"peninsular":[7.77,8.38,8.71]},"adic":{"provincial":0.43,"regional":0.55,"peninsular":0.62},"km":null,"notas":["Posibilidad de entrega en franja de mañana (10–14 h) o de tarde (16–19 h)."]},{"nombre":"TIPSA 10","plazo":"Entrega urgente antes de las 10:00 h","bandas":[2,5,10],"precios":{"provincial":[10.19,10.57,10.83],"regional":[10.19,10.57,10.83],"peninsular":[10.99,11.20,11.44]},"adic":{"provincial":0.77,"regional":0.77,"peninsular":0.77},"km":{"provincial":0.45,"regional":0.55,"peninsular":0.62},"notas":[]}],"islas":{"urgente":{"baleares":{"mayor":{"hasta":1,"base":12.55,"adic":4.89},"menor":{"hasta":1,"base":19.14,"adic":5.99}},"canarias":{"mayor":{"hasta":1,"base":13.78,"adic":8.26},"menor":{"hasta":1,"base":22.43,"adic":11.77}}},"cargaBaleares":{"mayor":{"hasta":10,"base":15.56,"adic":1.91},"menor":{"hasta":10,"base":17.43,"adic":2.16}},"cargaCanarias":{"mayor":{"hasta":10,"base":39.83,"adic":4.47},"menor":{"hasta":10,"base":46.23,"adic":5.74}},"maritimo":{"mayor":{"hasta":10,"base":19.41,"adic":2.16},"menor":{"hasta":10,"base":27.07,"adic":2.79}}},"ceutaMelilla":{"courier":{"hasta":1,"base":21.38,"adic":6.63},"carga":{"hasta":2,"base":15.29,"adic":4.14}},"portugal":{"bandas":[2,5,10],"p24":{"precios":[8.85,9.76,10.79],"adic":0.63},"p48":{"precios":[6.76,7.16,8.10],"adic":0.63},"islas":{"hasta":10,"base":85.00,"adic":6.83}},"classic":{"pesos":[1,3,5,10,15,20,25,31.5],"exceso":35,"islas":25,"paises":{"Alemania":{"transito":"3-4","zona":"ue","precios":[22.84,26.70,35.35,41.00,46.52,52.05,66.70,71.78]},"Austria":{"transito":"3-4","zona":"ue","precios":[26.04,29.90,40.15,47.39,52.92,58.45,81.58,93.52]},"Bélgica":{"transito":"3-4","zona":"ue","precios":[26.04,29.22,40.15,47.39,52.92,58.45,67.18,75.91]},"Bosnia":{"transito":"6-10","zona":"este","precios":[54.84,58.72,75.36,84.21,92.93,101.67,139.19,157.52]},"Bulgaria":{"transito":"5-6","zona":"ue","precios":[37.79,57.11,72.15,81.00,96.13,114.14,137.59,147.90]},"Croacia":{"transito":"5-6","zona":"ue","precios":[59.57,60.24,60.89,88.30,99.83,103.93,112.19,119.55]},"Dinamarca":{"transito":"4-5","zona":"ue","precios":[29.25,33.11,43.36,50.59,56.13,61.64,91.19,99.91]},"Eslovaquia":{"transito":"4-5","zona":"ue","precios":[30.25,33.11,57.13,59.63,67.80,70.13,79.87,85.63]},"Eslovenia":{"transito":"4-5","zona":"ue","precios":[30.25,33.11,50.89,55.92,63.44,65.75,87.49,93.63]},"Estonia":{"transito":"5-6","zona":"ue","precios":[34.05,37.91,59.36,68.20,73.73,79.26,110.39,125.51]},"Finlandia":{"transito":"4-6","zona":"ue","precios":[37.24,42.71,56.16,71.39,77.11,86.30,120.31,136.71]},"Francia":{"transito":"2-3","zona":"ue","precios":[21.25,25.90,35.35,41.00,48.13,53.64,68.79,77.51]},"Grecia":{"transito":"5-6","zona":"ue","precios":[40.45,58.72,73.75,84.21,100.46,115.27,135.99,157.52]},"Holanda":{"transito":"3-4","zona":"ue","precios":[26.04,29.90,40.15,47.39,52.92,58.45,67.18,75.91]},"Hungría":{"transito":"4-6","zona":"ue","precios":[29.88,31.42,54.23,66.22,68.55,70.88,82.57,88.45]},"Irlanda":{"transito":"4-5","zona":"ue","precios":[29.25,34.71,51.36,58.60,65.43,82.46,100.79,112.72]},"Italia":{"transito":"3-4","zona":"ue","precios":[25.72,29.90,40.15,47.39,52.92,58.45,75.94,81.51]},"Letonia":{"transito":"5-6","zona":"ue","precios":[31.04,36.87,57.13,69.92,77.36,90.87,123.68,131.62]},"Lituania":{"transito":"5-6","zona":"ue","precios":[31.04,36.87,57.13,69.92,77.36,80.21,109.04,116.26]},"Luxemburgo":{"transito":"3-4","zona":"ue","precios":[26.04,29.90,40.15,47.39,52.92,58.45,67.18,84.64]},"Noruega":{"transito":"4-6","zona":null,"precios":[51.65,58.72,75.36,84.21,92.93,101.67,145.59,157.52]},"Polonia":{"transito":"4-6","zona":"ue","precios":[28.48,33.79,43.68,49.56,60.52,69.34,73.11,78.53]},"Reino Unido":{"transito":"3-4","zona":null,"precios":[24.13,29.90,44.95,50.65,56.13,61.64,78.38,93.52]},"Rep. Checa":{"transito":"4-5","zona":"ue","precios":[30.25,33.11,57.13,59.63,67.80,70.13,79.87,85.63]},"Rumanía":{"transito":"4-5","zona":"ue","precios":[42.04,45.91,65.75,81.00,89.72,101.67,116.79,125.51]},"Serbia":{"transito":"6-10","zona":"este","precios":[51.65,58.72,75.36,84.21,92.93,101.67,145.59,157.52]},"Suecia":{"transito":"4-6","zona":"ue","precios":[32.12,36.05,55.37,72.50,78.53,84.05,94.07,101.51]},"Suiza":{"transito":"4-5","zona":null,"precios":[29.25,33.11,43.36,50.59,60.61,69.34,91.19,103.09]}}},"aereo":{"pesos":[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20],"zonas":{"ue":{"adic":17.04,"p":[34.26,46.36,53.18,59.99,66.75,73.57,82.10,90.59,99.09,107.63,116.14,124.62,133.13,141.65,150.19,158.66,167.18,175.71,184.19,192.71,201.19,209.71,218.22,226.71,235.25,243.72,252.24,260.77,269.28,277.77]},"este":{"adic":23.54,"p":[57.42,68.91,79.33,89.78,100.18,110.60,121.27,131.87,142.48,153.15,165.04,176.97,188.87,200.79,212.67,224.61,236.51,248.42,260.31,272.25,287.56,302.88,318.19,333.49,348.79,364.12,379.43,394.76,410.05,425.40]},"america":{"adic":29.82,"p":[63.78,80.81,97.33,113.82,130.33,146.83,166.56,186.24,205.92,225.60,249.42,273.24,297.11,320.94,344.75,368.57,392.38,416.21,440.00,463.85,490.42,517.01,543.60,570.18,596.77,623.35,649.94,676.53,703.11,729.70]},"china":{"adic":38.27,"p":[72.32,93.60,133.99,174.43,214.82,255.23,278.62,302.01,325.40,348.79,375.61,402.40,429.21,456.03,482.81,509.62,536.41,563.20,590.01,616.79,643.40,669.97,696.58,723.13,749.74,776.32,802.91,829.49,856.08,882.67]},"resto":{"adic":40.85,"p":[76.93,98.31,141.05,183.82,226.55,269.28,297.06,324.82,352.62,380.40,408.17,435.98,463.78,491.55,519.33,547.12,574.90,602.67,630.44,658.25,689.65,721.07,752.49,783.91,815.31,846.72,878.15,909.55,941.00,972.41]}}},"economy":{"pesos":[5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,125,150,175,200],"zonas":{"ue":[53.59,64.03,73.24,82.49,91.73,100.93,112.85,124.78,136.68,148.59,160.34,172.12,183.86,195.65,207.40,237.64,267.85,298.05,328.28],"este":[138.68,169.51,190.30,211.11,231.92,252.71,272.73,292.78,312.80,332.82,358.10,383.41,408.66,433.93,459.20,497.88,536.54,575.22,613.92],"america":[184.62,282.88,364.75,446.65,528.53,610.41,699.75,789.07,878.41,967.75,1147.11,1361.54,1575.92,1790.31,2004.72,2448.60,2927.48,3371.40,3850.28],"china":[181.64,300.76,375.92,451.09,526.31,601.49,685.62,769.74,853.84,937.96,1042.93,1182.86,1322.82,1462.76,1602.71,1984.85,2331.96,2714.09,3061.21],"resto":[273.95,315.62,367.00,418.38,469.73,521.08,585.12,649.14,713.15,777.17,886.75,996.32,1070.92,1180.47,1290.07,1560.54,1830.97,2066.46,2336.90]}},"clientes":{"t-kdiuji":{"nombre":"TARIFA 2026","tarifa":{"general":{"iva":21,"divisor":4000,"irregular":20,"cruzada":3.75,"validez":"31 de diciembre de 2026","whatsapp":"638471939, 687834184, 685830959","email":"granada@tip-sa.com;antonio.granada@tip-sa.com","regional":["04","11","14","18","21","23","29","41"],"provincial":[]},"nacional":[{"nombre":"TIPSA 24-48","plazo":"Servicio económico: entrega en 24 h (máximo 48 h)","bandas":[2,5,10,15,20,25,30,35,40,45,50],"precios":{"provincial":[3.65,3.72,4.90,5.13,6.39,8.24,8.86,10.72,12.60,15.68,18.16],"regional":[4.63,5.92,6.25,6.87,7.82,8.85,10.37,12.90,15.42,17.96,20.48],"peninsular":[5.48,6.56,6.87,7.94,11.63,15.42,17.96,19.23,25.55,28.08,31.88]},"adic":{"provincial":0.43,"regional":0.55,"peninsular":0.62},"km":null,"notas":[]},{"nombre":"TIPSA 14","plazo":"Entrega preferentemente antes de las 14:00 h","bandas":[2,5,10],"precios":{"provincial":[4.42,5.54,6.71],"regional":[6.44,7.66,8.06],"peninsular":[7.77,8.38,8.71]},"adic":{"provincial":0.43,"regional":0.55,"peninsular":0.62},"km":null,"notas":["Posibilidad de entrega en franja de mañana (10–14 h) o de tarde (16–19 h)."]},{"nombre":"TIPSA 10","plazo":"Entrega urgente antes de las 10:00 h","bandas":[2,5,10],"precios":{"provincial":[10.19,10.57,10.83],"regional":[10.19,10.57,10.83],"peninsular":[10.99,11.20,11.44]},"adic":{"provincial":0.77,"regional":0.77,"peninsular":0.77},"km":{"provincial":0.45,"regional":0.55,"peninsular":0.62},"notas":[]}],"islas":{"urgente":{"baleares":{"mayor":{"hasta":1,"base":12.55,"adic":4.89},"menor":{"hasta":1,"base":19.14,"adic":5.99}},"canarias":{"mayor":{"hasta":1,"base":13.78,"adic":8.26},"menor":{"hasta":1,"base":22.43,"adic":11.77}}},"cargaBaleares":{"mayor":{"hasta":10,"base":15.56,"adic":1.91},"menor":{"hasta":10,"base":17.43,"adic":2.16}},"cargaCanarias":{"mayor":{"hasta":10,"base":39.83,"adic":4.47},"menor":{"hasta":10,"base":46.23,"adic":5.74}},"maritimo":{"mayor":{"hasta":10,"base":19.41,"adic":2.16},"menor":{"hasta":10,"base":27.07,"adic":2.79}}},"ceutaMelilla":{"courier":{"hasta":1,"base":21.38,"adic":6.63},"carga":{"hasta":2,"base":15.29,"adic":4.14}},"portugal":{"bandas":[2,5,10],"p24":{"precios":[8.85,9.76,10.79],"adic":0.63},"p48":{"precios":[6.76,7.16,8.10],"adic":0.63},"islas":{"hasta":10,"base":85.00,"adic":6.83}},"classic":{"pesos":[1,3,5,10,15,20,25,31.5],"exceso":35,"islas":25,"paises":{"Alemania":{"transito":"3-4","zona":"ue","precios":[22.84,26.70,35.35,41.00,46.52,52.05,66.70,71.78]},"Austria":{"transito":"3-4","zona":"ue","precios":[26.04,29.90,40.15,47.39,52.92,58.45,81.58,93.52]},"Bélgica":{"transito":"3-4","zona":"ue","precios":[26.04,29.22,40.15,47.39,52.92,58.45,67.18,75.91]},"Bosnia":{"transito":"6-10","zona":"este","precios":[54.84,58.72,75.36,84.21,92.93,101.67,139.19,157.52]},"Bulgaria":{"transito":"5-6","zona":"ue","precios":[37.79,57.11,72.15,81.00,96.13,114.14,137.59,147.90]},"Croacia":{"transito":"5-6","zona":"ue","precios":[59.57,60.24,60.89,88.30,99.83,103.93,112.19,119.55]},"Dinamarca":{"transito":"4-5","zona":"ue","precios":[29.25,33.11,43.36,50.59,56.13,61.64,91.19,99.91]},"Eslovaquia":{"transito":"4-5","zona":"ue","precios":[30.25,33.11,57.13,59.63,67.80,70.13,79.87,85.63]},"Eslovenia":{"transito":"4-5","zona":"ue","precios":[30.25,33.11,50.89,55.92,63.44,65.75,87.49,93.63]},"Estonia":{"transito":"5-6","zona":"ue","precios":[34.05,37.91,59.36,68.20,73.73,79.26,110.39,125.51]},"Finlandia":{"transito":"4-6","zona":"ue","precios":[37.24,42.71,56.16,71.39,77.11,86.30,120.31,136.71]},"Francia":{"transito":"2-3","zona":"ue","precios":[21.25,25.90,35.35,41.00,48.13,53.64,68.79,77.51]},"Grecia":{"transito":"5-6","zona":"ue","precios":[40.45,58.72,73.75,84.21,100.46,115.27,135.99,157.52]},"Holanda":{"transito":"3-4","zona":"ue","precios":[26.04,29.90,40.15,47.39,52.92,58.45,67.18,75.91]},"Hungría":{"transito":"4-6","zona":"ue","precios":[29.88,31.42,54.23,66.22,68.55,70.88,82.57,88.45]},"Irlanda":{"transito":"4-5","zona":"ue","precios":[29.25,34.71,51.36,58.60,65.43,82.46,100.79,112.72]},"Italia":{"transito":"3-4","zona":"ue","precios":[25.72,29.90,40.15,47.39,52.92,58.45,75.94,81.51]},"Letonia":{"transito":"5-6","zona":"ue","precios":[31.04,36.87,57.13,69.92,77.36,90.87,123.68,131.62]},"Lituania":{"transito":"5-6","zona":"ue","precios":[31.04,36.87,57.13,69.92,77.36,80.21,109.04,116.26]},"Luxemburgo":{"transito":"3-4","zona":"ue","precios":[26.04,29.90,40.15,47.39,52.92,58.45,67.18,84.64]},"Noruega":{"transito":"4-6","zona":null,"precios":[51.65,58.72,75.36,84.21,92.93,101.67,145.59,157.52]},"Polonia":{"transito":"4-6","zona":"ue","precios":[28.48,33.79,43.68,49.56,60.52,69.34,73.11,78.53]},"Reino Unido":{"transito":"3-4","zona":null,"precios":[24.13,29.90,44.95,50.65,56.13,61.64,78.38,93.52]},"Rep. Checa":{"transito":"4-5","zona":"ue","precios":[30.25,33.11,57.13,59.63,67.80,70.13,79.87,85.63]},"Rumanía":{"transito":"4-5","zona":"ue","precios":[42.04,45.91,65.75,81.00,89.72,101.67,116.79,125.51]},"Serbia":{"transito":"6-10","zona":"este","precios":[51.65,58.72,75.36,84.21,92.93,101.67,145.59,157.52]},"Suecia":{"transito":"4-6","zona":"ue","precios":[32.12,36.05,55.37,72.50,78.53,84.05,94.07,101.51]},"Suiza":{"transito":"4-5","zona":null,"precios":[29.25,33.11,43.36,50.59,60.61,69.34,91.19,103.09]}}},"aereo":{"pesos":[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10,11,12,13,14,15,16,17,18,19,20],"zonas":{"ue":{"adic":17.04,"p":[34.26,46.36,53.18,59.99,66.75,73.57,82.10,90.59,99.09,107.63,116.14,124.62,133.13,141.65,150.19,158.66,167.18,175.71,184.19,192.71,201.19,209.71,218.22,226.71,235.25,243.72,252.24,260.77,269.28,277.77]},"este":{"adic":23.54,"p":[57.42,68.91,79.33,89.78,100.18,110.60,121.27,131.87,142.48,153.15,165.04,176.97,188.87,200.79,212.67,224.61,236.51,248.42,260.31,272.25,287.56,302.88,318.19,333.49,348.79,364.12,379.43,394.76,410.05,425.40]},"america":{"adic":29.82,"p":[63.78,80.81,97.33,113.82,130.33,146.83,166.56,186.24,205.92,225.60,249.42,273.24,297.11,320.94,344.75,368.57,392.38,416.21,440.00,463.85,490.42,517.01,543.60,570.18,596.77,623.35,649.94,676.53,703.11,729.70]},"china":{"adic":38.27,"p":[72.32,93.60,133.99,174.43,214.82,255.23,278.62,302.01,325.40,348.79,375.61,402.40,429.21,456.03,482.81,509.62,536.41,563.20,590.01,616.79,643.40,669.97,696.58,723.13,749.74,776.32,802.91,829.49,856.08,882.67]},"resto":{"adic":40.85,"p":[76.93,98.31,141.05,183.82,226.55,269.28,297.06,324.82,352.62,380.40,408.17,435.98,463.78,491.55,519.33,547.12,574.90,602.67,630.44,658.25,689.65,721.07,752.49,783.91,815.31,846.72,878.15,909.55,941.00,972.41]}}},"economy":{"pesos":[5,10,15,20,25,30,35,40,45,50,60,70,80,90,100,125,150,175,200],"zonas":{"ue":[53.59,64.03,73.24,82.49,91.73,100.93,112.85,124.78,136.68,148.59,160.34,172.12,183.86,195.65,207.40,237.64,267.85,298.05,328.28],"este":[138.68,169.51,190.30,211.11,231.92,252.71,272.73,292.78,312.80,332.82,358.10,383.41,408.66,433.93,459.20,497.88,536.54,575.22,613.92],"america":[184.62,282.88,364.75,446.65,528.53,610.41,699.75,789.07,878.41,967.75,1147.11,1361.54,1575.92,1790.31,2004.72,2448.60,2927.48,3371.40,3850.28],"china":[181.64,300.76,375.92,451.09,526.31,601.49,685.62,769.74,853.84,937.96,1042.93,1182.86,1322.82,1462.76,1602.71,1984.85,2331.96,2714.09,3061.21],"resto":[273.95,315.62,367.00,418.38,469.73,521.08,585.12,649.14,713.15,777.17,886.75,996.32,1070.92,1180.47,1290.07,1560.54,1830.97,2066.46,2336.90]}}}}}}</script>
+<script id="motor">
+(function () {
+  /* Copia exacta de la página tal como se sirvió: sirve para republicarla con la tarifa nueva */
+  const APP_HTML = document.getElementById("app").outerHTML;
+  const CSS = document.getElementById("estilos").textContent;
+  const MOTOR = document.getElementById("motor").textContent;
+  const TITULO = "Calcula tu envío · TIPSA Granada Centro";
+  const FUENTES = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&display=swap">';
+  const ESQUELETO = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>';
+
+  const ORIGINAL = JSON.parse(document.getElementById("tarifa-json").textContent);
+  // RAIZ = todos los datos (tarifa general + tarifas de clientes); E = tarifa en uso
+  const clonar = o => JSON.parse(JSON.stringify(o));
+  let RAIZ = clonar(ORIGINAL); if (!RAIZ.clientes) RAIZ.clientes = {};
+  const ENLACE = "https://claude.ai/artifact/9DKCW8R3X1teYaMHuRFJyc";
+  const tarifaDe = c => c && RAIZ.clientes[c] ? RAIZ.clientes[c].tarifa : RAIZ;
+  let sel = (location.hash || "").replace(/^#/, "");
+  try { if (!sel) { sel = sessionStorage.getItem("calc-sel") || ""; } } catch (e) {}
+  if (!RAIZ.clientes[sel]) sel = "";
+  let E = tarifaDe(sel);
+  let cambios = false;
+
+  /* ================== datos fijos ================== */
+  const PROVINCIAS = { "01": "Álava", "02": "Albacete", "03": "Alicante", "04": "Almería", "05": "Ávila", "06": "Badajoz", "07": "Illes Balears", "08": "Barcelona", "09": "Burgos", "10": "Cáceres", "11": "Cádiz", "12": "Castellón", "13": "Ciudad Real", "14": "Córdoba", "15": "A Coruña", "16": "Cuenca", "17": "Girona", "18": "Granada", "19": "Guadalajara", "20": "Gipuzkoa", "21": "Huelva", "22": "Huesca", "23": "Jaén", "24": "León", "25": "Lleida", "26": "La Rioja", "27": "Lugo", "28": "Madrid", "29": "Málaga", "30": "Murcia", "31": "Navarra", "32": "Ourense", "33": "Asturias", "34": "Palencia", "35": "Las Palmas", "36": "Pontevedra", "37": "Salamanca", "38": "Santa Cruz de Tenerife", "39": "Cantabria", "40": "Segovia", "41": "Sevilla", "42": "Soria", "43": "Tarragona", "44": "Teruel", "45": "Toledo", "46": "Valencia", "47": "Valladolid", "48": "Bizkaia", "49": "Zamora", "50": "Zaragoza", "51": "Ceuta", "52": "Melilla" };
+  const ISLAS = {
+    "07": [["Mallorca", "mayor"], ["Menorca", "menor"], ["Ibiza", "menor"], ["Formentera", "menor"]],
+    "35": [["Gran Canaria", "mayor"], ["Lanzarote", "menor"], ["Fuerteventura", "menor"]],
+    "38": [["Tenerife", "mayor"], ["La Palma", "menor"], ["La Gomera", "menor"], ["El Hierro", "menor"]]
+  };
+  const ZONAS_MUNDO = { ue: "Unión Europea", este: "Europa del Este, Turquía y Marruecos", america: "Estados Unidos, Canadá, México y Latinoamérica", china: "China y Hong Kong", resto: "Resto del mundo" };
+  const ORIGEN_BASE = "18";
+
+  /* ================== utilidades ================== */
+  const $ = id => document.getElementById(id);
+  const eur = n => n.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  const kg = n => n.toLocaleString("es-ES", { maximumFractionDigits: 2 }) + " kg";
+  const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) && n > 0 ? n : 0; };
+  const r2 = n => Math.round(n * 100) / 100;
+  function porBandas(bandas, precios, adic, W) {
+    for (let i = 0; i < bandas.length; i++) if (W <= bandas[i]) return precios[i];
+    return precios[precios.length - 1] + (W - bandas[bandas.length - 1]) * adic;
+  }
+  const baseMas = (o, W) => W <= o.hasta ? o.base : o.base + (W - o.hasta) * o.adic;
+  function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+  /* ================== origen ================== */
+  const selOrig = $("origProv");
+  selOrig.appendChild(new Option("Elige provincia…", ""));
+  Object.entries(PROVINCIAS).filter(([c]) => !ISLAS[c] && c !== "51" && c !== "52")
+    .sort((a, b) => a[1].localeCompare(b[1], "es")).forEach(([c, n]) => selOrig.appendChild(new Option(n, c)));
+  function origen() {
+    if ($("origenTipo").value === "gr" || !selOrig.value) return { prov: ORIGEN_BASE, txt: "Granada", cruzada: false };
+    return { prov: selOrig.value, txt: PROVINCIAS[selOrig.value], cruzada: selOrig.value !== ORIGEN_BASE };
+  }
+  function actualizarCamposOrigen() {
+    const otro = $("origenTipo").value === "otro";
+    $("campoOrigCp").hidden = !otro; $("campoOrigProv").hidden = !otro;
+  }
+  $("origenTipo").addEventListener("change", () => { actualizarCamposOrigen(); calcular(); if ($("origenTipo").value === "otro") $("origCp").focus(); });
+  $("origCp").addEventListener("input", () => {
+    const v = $("origCp").value.replace(/\D/g, "").slice(0, 5);
+    $("origCp").value = v;
+    if (v.length >= 2 && [...selOrig.options].some(op => op.value === v.slice(0, 2))) selOrig.value = v.slice(0, 2);
+    calcular();
+  });
+  selOrig.addEventListener("change", () => {
+    if ($("origCp").value.length >= 2 && $("origCp").value.slice(0, 2) !== selOrig.value) $("origCp").value = "";
+    calcular();
+  });
+
+  /* ================== destino ================== */
+  const selProv = $("prov");
+  selProv.appendChild(new Option("Elige provincia…", ""));
+  Object.entries(PROVINCIAS).sort((a, b) => a[1].localeCompare(b[1], "es")).forEach(([c, n]) => selProv.appendChild(new Option(n, c)));
+  const selPais = $("pais");
+  function rellenarPaises() {
+    const actual = selPais.value;
+    [...selPais.querySelectorAll("optgroup")].forEach(g => g.remove());
+    const gEu = document.createElement("optgroup"); gEu.label = "Europa";
+    Object.keys(E.classic.paises).forEach(n => gEu.appendChild(new Option(n, "eu:" + n)));
+    const gMundo = document.createElement("optgroup"); gMundo.label = "Resto del mundo";
+    ["este", "america", "china", "resto"].forEach(z => gMundo.appendChild(new Option(ZONAS_MUNDO[z], "mundo:" + z)));
+    selPais.append(gEu, gMundo);
+    if ([...selPais.options].some(o => o.value === actual)) selPais.value = actual;
+  }
+  rellenarPaises();
+
+  function destino() {
+    const pv = selPais.value;
+    if (pv.startsWith("eu:")) { const n = pv.slice(3); const c = E.classic.paises[n]; return { tipo: "intl", pais: n, zona: c.zona, classic: c, txt: n }; }
+    if (pv.startsWith("mundo:")) { const z = pv.slice(6); return { tipo: "intl", zona: z, txt: ZONAS_MUNDO[z] }; }
+    if (pv === "pt") return { tipo: "pt", zona: $("ptZona").value, txt: $("ptZona").value === "islas" ? "Madeira y Azores" : "Portugal peninsular" };
+    const p = selProv.value;
+    if (!p) return null;
+    const nombre = PROVINCIAS[p];
+    if (p === "51" || p === "52") return { tipo: "cm", txt: nombre };
+    if (ISLAS[p]) {
+      const [isla, tam] = $("isla").value.split("|");
+      return { tipo: p === "07" ? "baleares" : "canarias", isla: tam, txt: isla + " (" + nombre + ")" };
+    }
+    // Regional: origen y destino dentro de la zona regional; si no, peninsular
+    const o = origen(), G = E.general;
+    const zona = G.provincial.includes(p) && o.prov === ORIGEN_BASE ? "provincial"
+      : G.regional.includes(p) && G.regional.includes(o.prov) ? "regional" : "peninsular";
+    return { tipo: "es", zona, txt: nombre };
+  }
+  function actualizarCamposDestino() {
+    const es = selPais.value === "es", pt = selPais.value === "pt";
+    $("campoCp").hidden = !es; $("campoProv").hidden = !es; $("campoPt").hidden = !pt;
+    const islas = es && ISLAS[selProv.value];
+    $("campoIsla").hidden = !islas;
+    if (islas) {
+      const actual = $("isla").value;
+      $("isla").replaceChildren(...islas.map(([n, t]) => new Option(n, n + "|" + t)));
+      if ([...$("isla").options].some(o => o.value === actual)) $("isla").value = actual;
+    }
+  }
+  $("cp").addEventListener("input", () => {
+    const v = $("cp").value.replace(/\D/g, "").slice(0, 5);
+    $("cp").value = v;
+    if (v.length >= 2 && PROVINCIAS[v.slice(0, 2)]) selProv.value = v.slice(0, 2);
+    actualizarCamposDestino(); calcular();
+  });
+  selProv.addEventListener("change", () => {
+    if ($("cp").value.length >= 2 && $("cp").value.slice(0, 2) !== selProv.value) $("cp").value = "";
+    actualizarCamposDestino(); calcular();
+  });
+  ["pais", "isla", "ptZona"].forEach(id => $(id).addEventListener("change", () => { actualizarCamposDestino(); calcular(); }));
+
+  /* ================== bultos ================== */
+  let siguienteId = 1;
+  function nuevoBulto(v) {
+    v = v || {};
+    const fila = el("div", "bulto");
+    const id = siguienteId++;
+    fila.appendChild(el("div", "n", "#"));
+    [["peso", "Peso (kg)", v.peso], ["largo", "Largo (cm)", v.largo], ["ancho", "Ancho (cm)", v.ancho], ["alto", "Alto (cm)", v.alto], ["cant", "Cantidad", v.cant || 1]].forEach(([k, t, val]) => {
+      const l = el("label", "", t);
+      const i = el("input"); i.type = "number"; i.min = k === "cant" ? "1" : "0"; i.step = k === "peso" ? "0.1" : "1"; i.inputMode = "decimal";
+      i.id = "b" + id + "-" + k; i.dataset.k = k; if (val != null) i.value = val;
+      i.addEventListener("input", calcular);
+      l.appendChild(i); fila.appendChild(l);
+    });
+    const q = el("button", "quitar", "✕"); q.type = "button"; q.setAttribute("aria-label", "Quitar este bulto");
+    q.addEventListener("click", () => { if ($("bultos").children.length > 1) { fila.remove(); renumerar(); calcular(); } });
+    fila.appendChild(q);
+    fila.appendChild(el("div", "info-bulto"));
+    $("bultos").appendChild(fila);
+    renumerar();
+  }
+  function renumerar() { [...$("bultos").children].forEach((f, i) => { f.querySelector(".n").textContent = "#" + (i + 1); f.querySelector(".quitar").hidden = $("bultos").children.length === 1; }); }
+  $("anadir").addEventListener("click", () => { nuevoBulto(); calcular(); $("bultos").lastChild.querySelector("input").focus(); });
+
+  function leerBultos() {
+    return [...$("bultos").children].map(f => {
+      const g = k => num(f.querySelector('[data-k="' + k + '"]').value);
+      const b = { fila: f, peso: g("peso"), largo: g("largo"), ancho: g("ancho"), alto: g("alto"), cant: Math.max(1, Math.round(g("cant")) || 1) };
+      const dims = [b.largo, b.ancho, b.alto];
+      b.completo = b.peso > 0 || dims.every(d => d > 0);
+      b.vol = dims.every(d => d > 0) ? (b.largo * b.ancho * b.alto) / E.general.divisor : 0;
+      b.fact = Math.max(b.peso, b.vol);
+      b.max = Math.max(...dims); b.suma = dims.reduce((a, c) => a + c, 0);
+      b.estado = "ok";
+      if (b.peso > 50 || b.suma > 300 || b.max > 200) b.estado = "no";
+      else if (b.peso > 40 || b.suma > 250 || b.max > 150) b.estado = "irregular";
+      return b;
+    });
+  }
+
+  /* ================== precios ================== */
+  function opciones(d, W, nIrreg, bs, total, avisos, o) {
+    const G = E.general;
+    const extra = d.tipo === "intl" ? 0 : nIrreg * G.irregular;
+    const cruz = o.cruzada ? G.cruzada : 0;
+    const ops = [];
+    const add = (nombre, plazo, precio, notas) => ops.push({ nombre, plazo, precio: precio + extra + cruz,
+      notas: (notas || [])
+        .concat(extra ? [nIrreg + " bulto(s) irregular(es): incluye " + eur(extra) + " de suplemento."] : [])
+        .concat(cruz ? ["Recogida cruzada desde " + o.txt + ": incluye " + eur(cruz) + "."] : []) });
+
+    if (d.tipo === "es") {
+      E.nacional.forEach(s => {
+        const notas = (s.notas || []).slice();
+        if (s.km) notas.push("En poblaciones fuera de la capital se añade kilometraje ida y vuelta desde la agencia TIPSA de destino: " + eur(s.km[d.zona]) + "/km.");
+        add(s.nombre, s.plazo, porBandas(s.bandas, s.precios[d.zona], s.adic[d.zona], W), notas);
+      });
+    } else if (d.tipo === "baleares" || d.tipo === "canarias") {
+      const I = E.islas, t = d.isla, mayor = t === "mayor";
+      const adu = d.tipo === "canarias" ? ["Gastos de aduana de Canarias a cargo del remitente (despacho de exportación DUA: 25,00 €)."] : [];
+      add("TIPSA Insular Urgente", "Entrega al día siguiente (" + (mayor ? "24 h isla mayor" : "48 h isla menor") + ")", baseMas(I.urgente[d.tipo][t], W), adu);
+      if (d.tipo === "baleares") add("TIPSA Insular Carga Baleares", "Exprés carga (" + (mayor ? "72 h" : "96 h") + ")", baseMas(I.cargaBaleares[t], W));
+      else {
+        add("TIPSA Insular Carga Canarias", "Exprés carga en 48–72 h", baseMas(I.cargaCanarias[t], W), adu);
+        add("TIPSA Marítimo Canarias", "Servicio marítimo con enlace semanal", baseMas(I.maritimo[t], W), adu);
+      }
+    } else if (d.tipo === "cm") {
+      const adu = ["Despacho de aduanas de Ceuta y Melilla aparte (desde 20,00 €)."];
+      add("TIPSA Ceuta y Melilla Courier", "Entrega en 24 h", baseMas(E.ceutaMelilla.courier, W), adu);
+      add("TIPSA Ceuta y Melilla Carga", "Entrega en 72–96 h", baseMas(E.ceutaMelilla.carga, W), adu);
+    } else if (d.tipo === "pt") {
+      const P = E.portugal;
+      if (d.zona === "islas") add("TIPSA Portugal Islas", "Entrega en Madeira y Azores", baseMas(P.islas, W));
+      else {
+        add("TIPSA Portugal 24 h", "Entrega en 24 h", porBandas(P.bandas, P.p24.precios, P.p24.adic, W));
+        add("TIPSA Portugal 48/72 h", "Entrega en 48–72 h", porBandas(P.bandas, P.p48.precios, P.p48.adic, W),
+          ["Solo para destinos de las agencias de Oporto, Famalicão, Gran Lisboa, Coímbra, Viseu, Leiria y Matosinhos."]);
+      }
+    } else if (d.tipo === "intl") {
+      if (d.classic) {
+        const C = E.classic;
+        let suma = 0, excesos = 0, cabe = true;
+        bs.filter(b => b.completo).forEach(b => {
+          if (b.peso > C.pesos[C.pesos.length - 1]) { cabe = false; return; }
+          const lados = [b.largo, b.ancho, b.alto].sort((x, y) => y - x);
+          if (lados[0] > 175 || lados[0] + 2 * lados[1] + 2 * lados[2] > 300) excesos += b.cant;
+          suma += porBandas(C.pesos, d.classic.precios, 0, Math.max(b.peso, 0.01)) * b.cant;
+        });
+        if (cabe) {
+          const notas = ["Precio por bulto según su peso real (sin peso volumétrico). Tasa de combustible y seguro (hasta 520 € por bulto) incluidos."];
+          if (excesos) { suma += excesos * C.exceso; notas.push(excesos + " bulto(s) superan 175 cm de largo o 300 cm de envergadura: incluye " + eur(C.exceso) + " de suplemento por bulto."); }
+          if (["Francia", "Italia", "Reino Unido"].includes(d.pais)) notas.push("Córcega, Cerdeña, Sicilia, Isla de Man e Islas del Canal: +" + eur(C.islas) + ".");
+          add("TIPSA Classic Europe", "Puerta a puerta en " + d.classic.transito + " días laborables", suma, notas);
+        } else avisos.push("TIPSA Classic Europe no está disponible: admite bultos de hasta " + kg(C.pesos[C.pesos.length - 1]) + ".");
+      }
+      if (d.zona) {
+        const A = E.aereo, z = A.zonas[d.zona];
+        const Wa = Math.ceil(total * 2) / 2, tope = A.pesos[A.pesos.length - 1];
+        const pa = Wa <= tope ? porBandas(A.pesos, z.p, 0, Wa) : z.p[z.p.length - 1] + Math.ceil(Wa - tope) * z.adic;
+        const nAdu = d.zona === "ue" ? [] : ["Trámites de aduana en origen: 25,00 €. Aranceles e impuestos en destino a cargo del destinatario."];
+        add("TIPSA Internacional Aéreo", "Envío urgente por avión", pa, nAdu);
+        const Ec = E.economy, topeE = Ec.pesos[Ec.pesos.length - 1];
+        if (W <= topeE) add("TIPSA Internacional Economy", "Envío económico (más lento que el aéreo)", porBandas(Ec.pesos, Ec.zonas[d.zona], 0, W), nAdu);
+        else avisos.push("TIPSA Internacional Economy admite hasta " + topeE + " kg por envío. Para más peso, pregúntanos.");
+      } else avisos.push("Para " + d.txt + " solo tenemos tarifa Classic Europe. Si necesitas un envío aéreo, pregúntanos.");
+    }
+    return ops.sort((a, b) => a.precio - b.precio);
+  }
+
+  function dato(t, v) { const d = el("div"); d.appendChild(el("span", "", t)); d.appendChild(el("strong", "", v)); return d; }
+
+  function textosPie() {
+    $("validezTxt").textContent = "Precios orientativos de la tarifa de la agencia TIPSA 018000 Granada Centro, válidos hasta el " + E.general.validez + ". No incluyen la tasa de combustible, que varía según el precio medio del carburante.";
+    const kgm3 = Math.round(1000000 / E.general.divisor);
+    $("volTxt").textContent = "Se cobra el mayor entre el peso real y el peso volumétrico (1 m³ = " + kgm3 + " kg, es decir largo × ancho × alto en cm ÷ " + E.general.divisor + "). Medidas máximas por bulto: 40 kg, 150 cm de largo y 250 cm sumando las tres medidas. Bultos mayores, hasta 50 kg y 300 cm, se aceptan como irregulares con " + eur(E.general.irregular) + " de suplemento.";
+  }
+
+  function calcular() {
+    const o = origen();
+    const d = destino();
+    const bs = leerBultos();
+    const IVA = E.general.iva / 100;
+    $("origenTxt").replaceChildren("Recogida en ", el("strong", "", o.txt));
+    if ($("origenTipo").value === "otro" && !selOrig.value) $("origenTxt").replaceChildren("Escribe el código postal o elige la provincia de recogida. Mientras, calculamos desde Granada.");
+    const ct = $("cruzadaTxt");
+    ct.hidden = !o.cruzada;
+    ct.textContent = o.cruzada ? "Recogida cruzada: el envío sale de " + o.txt + ", fuera de Granada. Se suman " + eur(E.general.cruzada) + " por envío. Si la recogida es en un pueblo, puede añadirse kilometraje." : "";
+
+    let total = 0, n = 0, nIrreg = 0, bloqueo = false;
+    const intl = d && d.tipo === "intl";
+    bs.forEach(b => {
+      if (intl) b.estado = "ok";   // fuera de España cada servicio tiene sus propios límites
+      const info = b.fila.querySelector(".info-bulto");
+      info.className = "info-bulto";
+      if (!b.completo) { info.textContent = "Indica el peso y, si puedes, las medidas."; return; }
+      let t = "Peso real " + kg(b.peso);
+      if (b.vol) t += " · volumétrico " + kg(r2(b.vol));
+      t += " → se cobra " + kg(r2(b.fact)) + (b.cant > 1 ? " × " + b.cant : "");
+      if (b.estado === "irregular") { info.classList.add("aviso"); t += ". Bulto irregular: +" + eur(E.general.irregular) + " por bulto y puede tardar algo más."; nIrreg += b.cant; }
+      if (b.estado === "no") { info.classList.add("error"); t = "Este bulto supera 50 kg o 300 cm (200 cm de largo) y no se puede enviar por la red normal. Llámanos y te preparamos un servicio especial."; bloqueo = true; }
+      info.textContent = t;
+      total += b.fact * b.cant; n += b.cant;
+    });
+    const W = Math.ceil(total);
+
+    $("zonaTxt").replaceChildren();
+    if (d) {
+      $("zonaTxt").append("Destino: ", el("strong", "", d.txt));
+      if (d.tipo === "es") $("zonaTxt").append(" · tarifa ", el("span", "pill", d.zona));
+    }
+    $("etiqueta").replaceChildren(dato("Origen", o.txt), dato("Destino", d ? d.txt : "—"), dato("Bultos", n ? String(n) : "—"), dato("Peso a cobrar", W ? W + " kg" : "—"));
+
+    const notaDest = $("notaDest"); notaDest.replaceChildren();
+    const sinIva = d && (d.tipo === "canarias" || d.tipo === "cm" || (d.tipo === "intl" && d.zona !== "ue"));
+    if (d && (d.tipo === "canarias" || d.tipo === "cm"))
+      notaDest.appendChild(el("p", "nota-dest", "Envíos a " + (d.tipo === "canarias" ? "Canarias" : "Ceuta y Melilla") + ": precio sin IVA. Los impuestos de importación en destino los paga el destinatario."));
+    else if (sinIva)
+      notaDest.appendChild(el("p", "nota-dest", "Envío fuera de la Unión Europea: precio sin IVA. Los aranceles e impuestos de importación en destino los paga el destinatario."));
+
+    const cont = $("opciones"); cont.replaceChildren();
+    ultimo = null;
+    if (!d) { cont.appendChild(el("p", "vacio", "Escribe el código postal o elige la provincia de destino.")); pintarPedido(); return; }
+    if (!W) { cont.appendChild(el("p", "vacio", "Añade el peso de al menos un bulto para ver los precios.")); pintarPedido(); return; }
+    if (bloqueo) { cont.appendChild(el("p", "alerta", "Hay un bulto que no se puede enviar por la red normal. Llámanos al 958 40 86 59 y te damos precio.")); pintarPedido(); return; }
+
+    const avisos = [];
+    const lista = opciones(d, W, nIrreg, bs, total, avisos, o);
+    ultimo = { o, d, bs: bs.filter(b => b.completo), W, lista, sinIva, IVA };
+    pintarPedido();
+    avisos.forEach(t => notaDest.appendChild(el("p", "nota-dest", t)));
+    if (!lista.length) cont.appendChild(el("p", "vacio", "No hay ningún servicio con tarifa para este envío. Llámanos al 958 40 86 59 y te damos precio."));
+    lista.forEach((op, i) => {
+      const c = el("article", "op" + (i === 0 ? " mejor" : ""));
+      if (i === 0) c.appendChild(el("span", "cinta", "Más económico"));
+      c.appendChild(el("h3", "", op.nombre));
+      const pr = el("div", "precio");
+      if (sinIva) { pr.appendChild(el("strong", "", eur(op.precio))); pr.appendChild(el("small", "", "sin IVA")); }
+      else { pr.appendChild(el("strong", "", eur(op.precio * (1 + IVA)))); pr.appendChild(el("small", "", "IVA incl. · " + eur(op.precio) + " sin IVA")); }
+      c.appendChild(pr);
+      c.appendChild(el("div", "plazo", op.plazo));
+      if (op.notas.length) { const ul = el("ul"); op.notas.forEach(t => ul.appendChild(el("li", "", t))); c.appendChild(ul); }
+      cont.appendChild(c);
+    });
+  }
+
+  /* ================== encargo por WhatsApp o email ================== */
+  let ultimo = null;
+  const precioTxt = (op, u) => u.sinIva ? eur(op.precio) + " (sin IVA)" : eur(op.precio * (1 + u.IVA)) + " IVA incluido (" + eur(op.precio) + " sin IVA)";
+  function textoPedido() {
+    const u = ultimo; if (!u) return "";
+    const op = u.lista.find(x => x.nombre === $("pedServicio").value) || u.lista[0];
+    const l = ["Hola, quiero encargar un envío:", "",
+      "Origen: " + u.o.txt + ($("origCp").value && u.o.cruzada ? " (CP " + $("origCp").value + ")" : ""),
+      "Destino: " + u.d.txt + ($("cp").value && selPais.value === "es" ? " (CP " + $("cp").value + ")" : "")];
+    u.bs.forEach((b, i) => l.push("Bulto " + (i + 1) + ": " + (b.cant > 1 ? b.cant + " × " : "") + kg(b.peso) +
+      (b.largo && b.ancho && b.alto ? ", " + b.largo + "×" + b.ancho + "×" + b.alto + " cm" : "")));
+    l.push("Peso a cobrar: " + u.W + " kg");
+    if (op) l.push("Servicio: " + op.nombre + " – " + precioTxt(op, u));
+    l.push("");
+    const nom = $("pedNombre").value.trim(), tel = $("pedTel").value.trim(), notas = $("pedNotas").value.trim();
+    if (nom) l.push("Nombre: " + nom);
+    if (tel) l.push("Teléfono: " + tel);
+    if (notas) l.push("Comentarios: " + notas);
+    if (sel && RAIZ.clientes[sel]) l.push("Tarifa: " + RAIZ.clientes[sel].nombre);
+    l.push("(Calculado con la calculadora de la agencia TIPSA 018000 Granada Centro)");
+    return l.join("\n");
+  }
+  function pintarPedido() {
+    const sel = $("pedServicio"), antes = sel.value;
+    sel.replaceChildren(...(ultimo ? ultimo.lista.map(op => new Option(op.nombre + " – " + precioTxt(op, ultimo), op.nombre)) : [new Option("Calcula primero el precio", "")]));
+    if ([...sel.options].some(x => x.value === antes)) sel.value = antes;
+    actualizarEnlaces();
+  }
+  function actualizarEnlaces() {
+    const G = E.general, txt = textoPedido(), wa = $("pedWa"), ml = $("pedMail");
+    $("pedTexto").textContent = txt || "Cuando calcules el precio, aquí verás el pedido que nos vas a mandar.";
+    // Uno o varios números separados por coma: un botón de WhatsApp por número
+    const tels = String(G.whatsapp || "").split(/[,;\/\n]+/).map(t => t.replace(/\D/g, "")).filter(t => t.length >= 9);
+    wa.replaceChildren(...tels.map(t => {
+      const a = el("a", "forma wa", "WhatsApp " + (t.length === 9 ? t.replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3") : "+" + t));
+      a.target = "_blank"; a.rel = "noopener";
+      a.setAttribute("aria-disabled", String(!txt));
+      if (txt) a.href = "https://wa.me/" + (t.length === 9 ? "34" + t : t) + "?text=" + encodeURIComponent(txt);
+      return a;
+    }));
+    wa.hidden = !tels.length;
+    const okMail = !!(txt && G.email);
+    ml.setAttribute("aria-disabled", String(!okMail));
+    if (okMail) ml.href = "mailto:" + G.email + "?subject=" + encodeURIComponent("Pedido de envío – " + (ultimo ? ultimo.d.txt : "")) + "&body=" + encodeURIComponent(txt); else ml.removeAttribute("href");
+    $("pedEstado").textContent = G.email ? "Si el botón de email no abre tu correo, pulsa Copiar el pedido y mándalo a " + G.email + "." : "";
+  }
+  ["pedServicio", "pedNombre", "pedTel", "pedNotas"].forEach(id => $(id).addEventListener("input", actualizarEnlaces));
+  $("pedServicio").addEventListener("change", actualizarEnlaces);
+  $("pedCopiar").addEventListener("click", () => {
+    const txt = textoPedido(); if (!txt) return;
+    const ok = () => { $("pedEstado").textContent = "Pedido copiado. Pégalo en un WhatsApp o un correo para mandárnoslo."; };
+    const manual = () => { const r = document.createRange(); r.selectNodeContents($("pedTexto")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("pedEstado").textContent = "Texto seleccionado: pulsa Ctrl+C (o Copiar en el móvil)."; };
+    try { navigator.clipboard.writeText(txt).then(ok, manual); } catch (e) { manual(); }
+  });
+
+  /* ================== panel de tarifas (solo el dueño) ================== */
+  const fmt = (n, dec) => n.toLocaleString("es-ES", { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: false });
+  function leerNum(v) {
+    let s = String(v).trim().replace(/\s|€|%/g, "");
+    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+    const n = parseFloat(s);
+    return isFinite(n) && n >= 0 ? n : null;
+  }
+  function marcar() { cambios = true; $("pendiente").hidden = false; $("estadoPub").textContent = ""; textosPie(); calcular(); if (!$("admin").hidden) pintarEnviar(); }
+  function campoNum(get, set, dec, etiqueta) {
+    const i = el("input"); i.type = "text"; i.inputMode = "decimal"; i.value = fmt(get(), dec == null ? 2 : dec);
+    if (etiqueta) i.setAttribute("aria-label", etiqueta);
+    i.addEventListener("change", () => {
+      const n = leerNum(i.value);
+      if (n == null) { i.classList.add("mal"); return; }
+      i.classList.remove("mal"); set(dec === 0 ? Math.round(n) : r2(n)); i.value = fmt(dec === 0 ? Math.round(n) : r2(n), dec == null ? 2 : dec); marcar();
+    });
+    return i;
+  }
+  function campoTexto(get, set, etiqueta) {
+    const i = el("input", "texto"); i.type = "text"; i.value = get(); if (etiqueta) i.setAttribute("aria-label", etiqueta);
+    i.addEventListener("change", () => { set(i.value.trim()); marcar(); });
+    return i;
+  }
+  function tabla(titulo, cols, filas) {
+    const caja = el("div", "tabla-scroll");
+    const t = el("table", "tabla-ed");
+    if (titulo) t.appendChild(el("caption", "", titulo));
+    const th = el("thead"), trh = el("tr");
+    trh.appendChild(el("th", "", ""));
+    cols.forEach(c => trh.appendChild(el("th", "", c)));
+    th.appendChild(trh); t.appendChild(th);
+    const tb = el("tbody");
+    filas.forEach(f => {
+      const tr = el("tr"); tr.appendChild(el("th", "", f.label));
+      f.celdas.forEach(c => { const td = el("td"); if (c) td.appendChild(c); tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); caja.appendChild(t);
+    return caja;
+  }
+  const ZN = ["provincial", "regional", "peninsular"], ZN_T = ["Provincial", "Regional", "Peninsular"];
+  const ZM = ["ue", "este", "america", "china", "resto"], ZM_T = ["UE", "Europa Este, Turquía, Marruecos", "América", "China, Hong Kong", "Resto del mundo"];
+
+  const PESTANAS = {
+    general(c) {
+      const G = E.general;
+      const f = el("div", "ficha");
+      const fila = (t, inp) => { const l = el("label", "campo", t); l.appendChild(inp); return l; };
+      f.append(
+        fila("IVA (%)", campoNum(() => G.iva, v => G.iva = v)),
+        fila("Peso volumétrico: cm³ por kg (4000 = 250 kg/m³)", campoNum(() => G.divisor, v => G.divisor = v || 4000, 0)),
+        fila("Suplemento bulto irregular (€/bulto)", campoNum(() => G.irregular, v => G.irregular = v)),
+        fila("Recogida cruzada (€/envío)", campoNum(() => G.cruzada, v => G.cruzada = v)),
+        fila("Tarifa válida hasta", campoTexto(() => G.validez, v => G.validez = v || G.validez)),
+        fila("WhatsApp donde recibes los pedidos (varios, separados por comas)", campoTexto(() => G.whatsapp || "", v => G.whatsapp = v)),
+        fila("Email donde recibes los pedidos", campoTexto(() => G.email || "", v => G.email = v)));
+      f.querySelectorAll("input").forEach(i => { i.style.width = "100%"; i.style.textAlign = "left"; });
+      c.appendChild(f);
+      c.appendChild(el("p", "ayuda", "Provincias con precio REGIONAL (cuando el origen y el destino están las dos marcadas). El resto de la península va a precio peninsular."));
+      const p = el("div", "provs");
+      Object.entries(PROVINCIAS).filter(([k]) => !ISLAS[k] && k !== "51" && k !== "52").sort((a, b) => a[1].localeCompare(b[1], "es")).forEach(([k, n]) => {
+        const l = el("label"); const cb = el("input"); cb.type = "checkbox"; cb.checked = G.regional.includes(k); cb.id = "reg-" + k;
+        cb.addEventListener("change", () => { G.regional = G.regional.filter(x => x !== k); if (cb.checked) G.regional.push(k); marcar(); });
+        l.append(cb, document.createTextNode(n)); p.appendChild(l);
+      });
+      c.appendChild(p);
+    },
+    nacional(c) {
+      E.nacional.forEach(s => {
+        const filas = s.bandas.map((b, i) => ({ label: "Hasta " + fmt(b, 0) + " kg", celdas: ZN.map(z => campoNum(() => s.precios[z][i], v => s.precios[z][i] = v)) }));
+        filas.push({ label: "Kg adicional", celdas: ZN.map(z => campoNum(() => s.adic[z], v => s.adic[z] = v)) });
+        if (s.km) filas.push({ label: "Kilometraje (€/km)", celdas: ZN.map(z => campoNum(() => s.km[z], v => s.km[z] = v)) });
+        c.appendChild(tabla(s.nombre + " — " + s.plazo, ZN_T, filas));
+      });
+    },
+    islas(c) {
+      const I = E.islas, CM = E.ceutaMelilla, P = E.portugal;
+      const items = [
+        ["Insular Urgente · Baleares isla mayor", I.urgente.baleares.mayor], ["Insular Urgente · Baleares isla menor", I.urgente.baleares.menor],
+        ["Insular Urgente · Canarias isla mayor", I.urgente.canarias.mayor], ["Insular Urgente · Canarias isla menor", I.urgente.canarias.menor],
+        ["Carga Baleares · isla mayor", I.cargaBaleares.mayor], ["Carga Baleares · isla menor", I.cargaBaleares.menor],
+        ["Carga Canarias · isla mayor", I.cargaCanarias.mayor], ["Carga Canarias · isla menor", I.cargaCanarias.menor],
+        ["Marítimo Canarias · isla mayor", I.maritimo.mayor], ["Marítimo Canarias · isla menor", I.maritimo.menor],
+        ["Ceuta y Melilla Courier", CM.courier], ["Ceuta y Melilla Carga", CM.carga],
+        ["Portugal · Madeira y Azores", P.islas]];
+      c.appendChild(tabla("Islas, Ceuta, Melilla y Madeira/Azores: precio hasta X kg + cada kg adicional", ["Hasta (kg)", "Precio", "Kg adicional"],
+        items.map(([t, o]) => ({ label: t, celdas: [campoNum(() => o.hasta, v => o.hasta = v || o.hasta), campoNum(() => o.base, v => o.base = v), campoNum(() => o.adic, v => o.adic = v)] }))));
+      const filas = P.bandas.map((b, i) => ({ label: "Hasta " + fmt(b, 0) + " kg", celdas: [campoNum(() => P.p24.precios[i], v => P.p24.precios[i] = v), campoNum(() => P.p48.precios[i], v => P.p48.precios[i] = v)] }));
+      filas.push({ label: "Kg adicional", celdas: [campoNum(() => P.p24.adic, v => P.p24.adic = v), campoNum(() => P.p48.adic, v => P.p48.adic = v)] });
+      c.appendChild(tabla("Portugal peninsular", ["24 h", "48/72 h"], filas));
+    },
+    classic(c) {
+      const C = E.classic;
+      c.appendChild(tabla("TIPSA Classic Europe: precio por bulto (combustible incluido)", ["Tránsito (días)"].concat(C.pesos.map(p => "Hasta " + fmt(p, p % 1 ? 1 : 0) + " kg")),
+        Object.entries(C.paises).map(([n, o]) => ({ label: n, celdas: [campoTexto(() => o.transito, v => o.transito = v || o.transito, "Tránsito " + n)].concat(C.pesos.map((_, i) => campoNum(() => o.precios[i], v => o.precios[i] = v))) }))));
+      c.appendChild(tabla("Suplementos Classic Europe", ["€"], [
+        { label: "Exceso de medidas (por bulto)", celdas: [campoNum(() => C.exceso, v => C.exceso = v)] },
+        { label: "Córcega, Cerdeña, Sicilia, Isla de Man, Islas del Canal", celdas: [campoNum(() => C.islas, v => C.islas = v)] }]));
+    },
+    aereo(c) {
+      const A = E.aereo;
+      const filas = A.pesos.map((p, i) => ({ label: "Hasta " + fmt(p, p % 1 ? 1 : 0) + " kg", celdas: ZM.map(z => campoNum(() => A.zonas[z].p[i], v => A.zonas[z].p[i] = v)) }));
+      filas.push({ label: "Cada kg más de " + A.pesos[A.pesos.length - 1] + " kg", celdas: ZM.map(z => campoNum(() => A.zonas[z].adic, v => A.zonas[z].adic = v)) });
+      c.appendChild(tabla("TIPSA Internacional Aéreo", ZM_T, filas));
+    },
+    economy(c) {
+      const Ec = E.economy;
+      c.appendChild(tabla("TIPSA Internacional Economy", ZM_T, Ec.pesos.map((p, i) => ({ label: "Hasta " + p + " kg", celdas: ZM.map(z => campoNum(() => Ec.zonas[z][i], v => Ec.zonas[z][i] = v)) }))));
+    }
+  };
+  const NOMBRES_P = { general: "General", nacional: "Nacional", islas: "Islas, Ceuta, Melilla y Portugal", classic: "Classic Europe", aereo: "Aéreo", economy: "Economy" };
+  let pestana = "nacional";
+
+  /* ---------- varias tarifas: general y una por cliente ---------- */
+  function pintarCabeceraCliente() {
+    const p = $("clienteTarifa");
+    p.hidden = !sel;
+    p.textContent = sel ? "Tarifa personalizada para " + RAIZ.clientes[sel].nombre : "";
+  }
+  function seleccionar(c) {
+    sel = c && RAIZ.clientes[c] ? c : "";
+    E = tarifaDe(sel);
+    rellenarPaises(); actualizarCamposDestino(); pintarCabeceraCliente(); textosPie(); calcular();
+    if (!$("admin").hidden) pintarPanel();
+  }
+  let creando = false;
+  function pintarTarifas() {
+    const b = $("botonesTarifa"); b.replaceChildren();
+    const boton = (txt, c) => {
+      const x = el("button", c === sel ? "on" : "", txt); x.type = "button";
+      x.addEventListener("click", () => { creando = false; seleccionar(c); });
+      return x;
+    };
+    b.appendChild(boton("General", ""));
+    Object.entries(RAIZ.clientes).sort((a, z) => a[1].nombre.localeCompare(z[1].nombre, "es")).forEach(([c, o]) => b.appendChild(boton(o.nombre, c)));
+    const n = el("button", "nueva", "+ Nueva tarifa de cliente"); n.type = "button";
+    n.addEventListener("click", () => { creando = true; pintarTarifas(); });
+    b.appendChild(n);
+
+    const d = $("tarifaDatos"); d.replaceChildren();
+    if (creando) {
+      const l = el("label", "", "Nombre del cliente");
+      const i = el("input"); i.type = "text"; i.id = "nuevaTarifaNombre"; i.placeholder = "Ej.: Bodegas Mar";
+      l.appendChild(i);
+      const ok = el("button", "btn-pri", "Crear tarifa"); ok.type = "button";
+      const no = el("button", "btn-sec", "Cancelar"); no.type = "button";
+      const crear = () => {
+        const nombre = i.value.trim(); if (!nombre) { i.focus(); return; }
+        const copia = clonar(E); delete copia.clientes;
+        let c; do { c = "t-" + Math.random().toString(36).slice(2, 8); } while (RAIZ.clientes[c]);
+        RAIZ.clientes[c] = { nombre, tarifa: copia };
+        creando = false; marcar(); seleccionar(c);
+        $("estadoPub").textContent = "Tarifa de " + nombre + " creada como copia de la tarifa que tenías elegida. Cambia sus precios y pulsa Guardar y publicar.";
+      };
+      ok.addEventListener("click", crear);
+      i.addEventListener("keydown", e => { if (e.key === "Enter") crear(); });
+      no.addEventListener("click", () => { creando = false; pintarTarifas(); });
+      d.append(l, ok, no);
+      setTimeout(() => i.focus(), 0);
+      return;
+    }
+    if (sel) {
+      const cl = RAIZ.clientes[sel];
+      const l = el("label", "", "Nombre del cliente");
+      const i = el("input"); i.type = "text"; i.value = cl.nombre; i.id = "nombreTarifa";
+      i.addEventListener("change", () => { const v = i.value.trim(); if (v) { cl.nombre = v; marcar(); pintarTarifas(); pintarCabeceraCliente(); pintarEnviar(); } });
+      l.appendChild(i);
+      const cod = el("span", "codigo", "Enlace propio: " + ENLACE + "#" + sel);
+      const bor = el("button", "btn-borrar", "Borrar esta tarifa"); bor.type = "button";
+      bor.addEventListener("click", () => {
+        if (!bor.dataset.conf) { bor.dataset.conf = "1"; bor.textContent = "¿Seguro? Pulsa otra vez para borrar"; return; }
+        delete RAIZ.clientes[sel]; marcar(); seleccionar("");
+        $("estadoPub").textContent = "Tarifa borrada. Pulsa Guardar y publicar para que se borre también en internet.";
+      });
+      d.append(l, bor, cod);
+    } else {
+      d.appendChild(el("span", "codigo", "Enlace de la tarifa general: " + ENLACE));
+    }
+  }
+
+  function mensajeEnvio() {
+    const nom = $("envNombre").value.trim();
+    const enlace = ENLACE + (sel ? "#" + sel : "");
+    return "Hola" + (nom ? " " + nom : "") + ", te mando la calculadora de envíos de la agencia TIPSA Granada Centro" + (sel ? " con tu tarifa" : "") +
+      ". Con ella ves al momento el precio de tus envíos según el destino, el peso y las medidas, y nos los puedes encargar por WhatsApp o por email:\n\n" +
+      enlace + "\n\nUn saludo,\nAgencia TIPSA Granada Centro 018000\nTel. 958 40 86 59 · granada@tip-sa.com";
+  }
+  function pintarEnviar() {
+    if (!$("envNombre").value && sel && RAIZ.clientes[sel]) $("envNombre").value = RAIZ.clientes[sel].nombre;
+    const nueva = sel && !(ORIGINAL.clientes && ORIGINAL.clientes[sel]);
+    const nombreT = sel ? "la tarifa de " + RAIZ.clientes[sel].nombre : "la tarifa General";
+    $("envAyuda").textContent = nueva
+      ? "Esta tarifa todavía no está publicada. Pulsa primero Guardar y publicar; si no, el cliente no podrá verla."
+      : (cambios ? "Ojo: tienes cambios sin publicar. Pulsa Guardar y publicar antes de enviar para que el cliente vea los precios nuevos. " : "") +
+        "Vas a mandar " + nombreT + ". Escribe el teléfono o el correo del cliente y pulsa el botón que te convenga.";
+    const txt = mensajeEnvio();
+    $("envTexto").textContent = txt;
+    const tel = $("envTel").value.replace(/\D/g, ""), telInt = tel.length === 9 ? "34" + tel : tel;
+    const mail = $("envMail").value.trim();
+    const wa = $("envWa"), ml = $("envMailBtn");
+    const okWa = !nueva && telInt.length >= 9, okMail = !nueva && /.+@.+\..+/.test(mail);
+    wa.setAttribute("aria-disabled", String(!okWa)); ml.setAttribute("aria-disabled", String(!okMail));
+    if (okWa) wa.href = "https://wa.me/" + telInt + "?text=" + encodeURIComponent(txt); else wa.removeAttribute("href");
+    if (okMail) ml.href = "mailto:" + mail + "?subject=" + encodeURIComponent("Calculadora de envíos TIPSA Granada Centro") + "&body=" + encodeURIComponent(txt); else ml.removeAttribute("href");
+    $("envEstado").textContent = okMail ? "Si el botón de email no abre tu correo, pulsa Copiar enlace y mensaje y pégalo en un correo nuevo." : "";
+  }
+  ["envNombre", "envTel", "envMail"].forEach(id => $(id).addEventListener("input", pintarEnviar));
+  $("envCopiar").addEventListener("click", () => {
+    const txt = mensajeEnvio();
+    const ok = () => { $("envEstado").textContent = "Copiado. Pégalo en un WhatsApp o en un correo para el cliente."; };
+    const manual = () => { const r = document.createRange(); r.selectNodeContents($("envTexto")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("envEstado").textContent = "Texto seleccionado: pulsa Ctrl+C para copiarlo."; };
+    try { navigator.clipboard.writeText(txt).then(ok, manual); } catch (e) { manual(); }
+  });
+  window.addEventListener("hashchange", () => seleccionar((location.hash || "").replace(/^#/, "")));
+
+  function pintarPanel() {
+    pintarTarifas(); pintarEnviar();
+    const pb = $("pestanas"); pb.replaceChildren();
+    Object.keys(PESTANAS).forEach(k => {
+      const b = el("button", k === pestana ? "on" : "", NOMBRES_P[k]); b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", String(k === pestana));
+      b.addEventListener("click", () => { pestana = k; pintarPanel(); });
+      pb.appendChild(b);
+    });
+    const c = $("adminCont"); c.replaceChildren();
+    const g = el("div"); g.style.display = "grid"; g.style.gap = "14px";
+    PESTANAS[pestana](g); c.appendChild(g);
+  }
+
+  function subirTodo(f) {
+    const m = a => a.forEach((v, i) => a[i] = r2(v * f));
+    const mo = (o, ks) => ks.forEach(k => o[k] = r2(o[k] * f));
+    E.nacional.forEach(s => { ZN.forEach(z => m(s.precios[z])); mo(s.adic, ZN); if (s.km) mo(s.km, ZN); });
+    const I = E.islas;
+    [I.urgente.baleares.mayor, I.urgente.baleares.menor, I.urgente.canarias.mayor, I.urgente.canarias.menor, I.cargaBaleares.mayor, I.cargaBaleares.menor,
+     I.cargaCanarias.mayor, I.cargaCanarias.menor, I.maritimo.mayor, I.maritimo.menor, E.ceutaMelilla.courier, E.ceutaMelilla.carga, E.portugal.islas].forEach(o => mo(o, ["base", "adic"]));
+    m(E.portugal.p24.precios); m(E.portugal.p48.precios); mo(E.portugal.p24, ["adic"]); mo(E.portugal.p48, ["adic"]);
+    Object.values(E.classic.paises).forEach(p => m(p.precios));
+    ZM.forEach(z => { m(E.aereo.zonas[z].p); mo(E.aereo.zonas[z], ["adic"]); m(E.economy.zonas[z]); });
+  }
+  $("subidaBtn").addEventListener("click", () => {
+    const raw = String($("subidaPct").value).trim().replace(",", ".");
+    const p = parseFloat(raw);
+    if (!isFinite(p) || p === 0 || p <= -100) { $("subidaTxt").textContent = "Escribe un porcentaje, por ejemplo 3,5 (o -2 para bajar)."; return; }
+    subirTodo(1 + p / 100);
+    $("subidaTxt").textContent = "Aplicado: " + (p > 0 ? "+" : "") + fmt(p, 2) + " % a todos los precios. Revisa y pulsa Guardar y publicar.";
+    $("subidaPct").value = "";
+    marcar(); pintarPanel();
+  });
+
+  $("descartar").addEventListener("click", () => {
+    RAIZ = clonar(ORIGINAL); if (!RAIZ.clientes) RAIZ.clientes = {};
+    cambios = false; creando = false;
+    $("pendiente").hidden = true; $("subidaTxt").textContent = "";
+    seleccionar(RAIZ.clientes[sel] ? sel : "");
+    $("estadoPub").textContent = "Cambios descartados.";
+  });
+
+  function documento() {
+    const json = JSON.stringify(RAIZ).replace(/</g, "\\u003c");
+    return ESQUELETO + "<title>" + TITULO + "</title>\n" + FUENTES + "\n<style id=\"estilos\">" + CSS + "</style>\n\n" + APP_HTML +
+      "\n\n<script type=\"application/json\" id=\"tarifa-json\">" + json + "<\/script>\n<script id=\"motor\">" + MOTOR + "<\/script>\n</body></html>";
+  }
+
+  let artifactNs = null;
+  $("guardar").addEventListener("click", async () => {
+    const st = $("estadoPub"); st.className = "estado-pub";
+    if (!cambios) { st.textContent = "No hay cambios que publicar."; return; }
+    if (!artifactNs) { st.className = "estado-pub mal"; st.textContent = "Desde aquí no se puede publicar. Abre la calculadora desde tu enlace de claude.ai con tu cuenta."; return; }
+    $("guardar").disabled = true; st.textContent = "Publicando…";
+    try { sessionStorage.setItem("calc-sel", sel); sessionStorage.setItem("calc-panel", "1"); } catch (e) {}
+    try {
+      await artifactNs.publish(documento());
+      st.textContent = "Publicado. Recargando con la tarifa nueva…";
+    } catch (e) {
+      $("guardar").disabled = false; st.className = "estado-pub mal";
+      const c = e && e.code;
+      st.textContent =
+        c === "conflict" ? "La calculadora se ha actualizado desde otro sitio. Se va a recargar; vuelve a hacer tus cambios." :
+        c === "not_writer" || c === "not_granted" || c === "consent_required" ? "Tu usuario no tiene permiso para publicar esta calculadora." :
+        c === "too_large" ? "La página es demasiado grande para publicarla." :
+        c === "rate_limited" ? "Has publicado muchas veces seguidas. Espera un minuto y vuelve a intentarlo." :
+        "No se ha podido publicar. Comprueba la conexión y vuelve a intentarlo.";
+    }
+  });
+
+  $("btnAdmin").addEventListener("click", () => {
+    const a = $("admin"); a.hidden = !a.hidden;
+    $("app").classList.toggle("ancho", !a.hidden);
+    $("btnAdmin").textContent = a.hidden ? "Editar tarifas" : "Cerrar panel";
+    if (!a.hidden) { pintarPanel(); a.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  });
+
+  async function activarPanel() {
+    try {
+      if (!window.claude || !window.claude.use) return;
+      const [user, art] = await Promise.all([window.claude.use("user"), window.claude.use("artifact")]);
+      const puede = user ? await user.canEdit() : false;
+      if (puede && art) {
+        artifactNs = art; $("btnAdmin").hidden = false;
+        let abrir = false;
+        try { abrir = sessionStorage.getItem("calc-panel") === "1"; sessionStorage.removeItem("calc-panel"); sessionStorage.removeItem("calc-sel"); } catch (e) {}
+        if (abrir) $("btnAdmin").click();
+      }
+    } catch (e) { /* sin panel: vista de cliente */ }
+  }
+
+  /* Ejemplo al abrir: una caja a Málaga */
+  $("cp").value = "29001"; selProv.value = "29";
+  nuevoBulto({ peso: 4, largo: 40, ancho: 30, alto: 30 });
+  actualizarCamposOrigen(); actualizarCamposDestino(); pintarCabeceraCliente(); textosPie(); calcular();
+  activarPanel();
+})();
+</script>
+
+</body>
+</html>
