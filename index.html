@@ -120,6 +120,13 @@ input[type=number] { font-variant-numeric: tabular-nums; }
 .nota-dest { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 14px; font-size: 14px; margin: 0; }
 .nota-agencia { margin: 0; font-size: 14px; color: var(--accent); border-top: 1px solid var(--line); padding-top: 12px; }
 .nota-agencia strong { font-weight: 700; }
+.extras-tarifa { margin: 0 0 14px; border: 2px solid var(--line); border-radius: 18px 4px 18px 4px; padding: 12px 14px; }
+.extras-tarifa h3 { margin: 0 0 8px; font-size: 15px; color: var(--accent); }
+.extras-tarifa table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.extras-tarifa td { padding: 6px 4px; border-top: 1px solid var(--line); vertical-align: top; }
+.extras-tarifa tr:first-child td { border-top: 0; }
+.extras-tarifa td.precio { text-align: right; font-weight: 700; white-space: nowrap; }
+.extras-tarifa .como { display: block; font-size: 12.5px; opacity: .75; }
 
 .contacto { background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline; font-size: 15px; }
 .contacto strong { font-family: var(--f-display); }
@@ -318,6 +325,7 @@ footer p { margin: 0; }
     <div class="etiqueta" id="etiqueta"></div>
     <div id="notaDest"></div>
     <div class="opciones" id="opciones"></div>
+    <div class="extras-tarifa" id="extrasTarifa" hidden></div>
     <p class="nota-agencia"><strong>Precios de la agencia TIPSA 018000 Granada Centro</strong> (Lopal 2010, S.L.). Otras agencias TIPSA pueden aplicar tarifas distintas.</p>
   </section>
 
@@ -611,6 +619,24 @@ footer p { margin: 0; }
     $("validezTxt").textContent = "Precios orientativos de la tarifa de la agencia TIPSA 018000 Granada Centro, válidos hasta el " + E.general.validez + ". No incluyen la tasa de combustible, que varía según el precio medio del carburante.";
     const kgm3 = Math.round(1000000 / E.general.divisor);
     $("volTxt").textContent = "Se cobra el mayor entre el peso real y el peso volumétrico (1 m³ = " + kgm3 + " kg, es decir largo × ancho × alto en cm ÷ " + E.general.divisor + "). Medidas máximas por bulto: 40 kg, 150 cm de largo y 250 cm sumando las tres medidas. Bultos mayores, hasta 50 kg y 300 cm, se aceptan como irregulares con " + eur(E.general.irregular) + " de suplemento.";
+    pintarExtras();
+  }
+
+  function pintarExtras() {
+    const caja = $("extrasTarifa");
+    const lista = (E.general.extras || []).filter(x => x && (x.concepto || x.como || x.precio != null));
+    caja.hidden = !lista.length;
+    if (!lista.length) { caja.replaceChildren(); return; }
+    const t = el("table");
+    lista.forEach(x => {
+      const tr = el("tr");
+      const c = el("td", "", x.concepto || "");
+      if (x.como) c.appendChild(el("span", "como", x.como));
+      tr.appendChild(c);
+      tr.appendChild(el("td", "precio", x.precio != null ? eur(Number(x.precio)) : ""));
+      t.appendChild(tr);
+    });
+    caja.replaceChildren(el("h3", "", "Otros servicios y suplementos de tu tarifa (sin IVA)"), t);
   }
 
   function calcular() {
