@@ -39,7 +39,7 @@ button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--tape); outline-offset: 2px; }
 
 /* Cabecera */
-header { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 4px solid var(--tape); }
+header { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 12px solid var(--tape); }
 .cab-fila { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .logo { display: block; width: 150px; max-width: 45%; height: auto; background: #ffffff; border-radius: 8px; padding: 4px; margin-bottom: 4px; }
 .agencia { display: grid; gap: 2px; font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); font-weight: 600; }
@@ -66,7 +66,8 @@ h1 span { background: none; }
     linear-gradient(var(--esq), var(--esq)) right bottom / var(--grosor) var(--largo) no-repeat,
     var(--fondo);
 }
-.bloque { padding: 22px; display: grid; gap: 14px; min-width: 0; }
+.bloque, .admin { --grosor: 21px; --largo: 52px; }
+.bloque { padding: 30px; display: grid; gap: 14px; min-width: 0; }
 .bloque h2 { font-family: var(--f-display); font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0; display: flex; align-items: center; gap: 10px; color: var(--accent); }
 .bloque h2 b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--tape); color: var(--tape-ink); font-size: 13px; }
 
@@ -516,10 +517,11 @@ footer p { margin: 0; }
     const fila = el("div", "bulto");
     const id = siguienteId++;
     fila.appendChild(el("div", "n", "#"));
-    [["peso", "Peso (kg)", v.peso], ["largo", "Largo (cm)", v.largo], ["ancho", "Ancho (cm)", v.ancho], ["alto", "Alto (cm)", v.alto], ["cant", "Cantidad", v.cant || 1]].forEach(([k, t, val]) => {
+    [["peso", "Peso (kg)", v.peso], ["largo", "Largo (cm)", v.largo], ["ancho", "Ancho (cm)", v.ancho], ["alto", "Alto (cm)", v.alto], ["cant", "Cantidad", v.cant === "" ? null : (v.cant || 1)]].forEach(([k, t, val]) => {
       const l = el("label", "", t);
       const i = el("input"); i.type = "number"; i.min = k === "cant" ? "1" : "0"; i.step = k === "peso" ? "0.1" : "1"; i.inputMode = "decimal";
       i.id = "b" + id + "-" + k; i.dataset.k = k; if (val != null) i.value = val;
+      if (k === "cant") i.placeholder = "1";
       i.addEventListener("input", calcular);
       l.appendChild(i); fila.appendChild(l);
     });
@@ -1144,9 +1146,9 @@ footer p { margin: 0; }
     } catch (e) { /* sin panel: vista de cliente */ }
   }
 
-  /* Ejemplo al abrir: una caja a Málaga */
-  $("cp").value = "29001"; selProv.value = "29";
-  nuevoBulto({ peso: 4, largo: 40, ancho: 30, alto: 30 });
+  /* Al abrir, todo en blanco para que lo rellene el cliente */
+  $("cp").value = ""; selProv.value = "";
+  nuevoBulto({ cant: "" });
   actualizarCamposOrigen(); actualizarCamposDestino(); pintarCabeceraCliente(); textosPie(); calcular();
   activarPanel();
 })();
