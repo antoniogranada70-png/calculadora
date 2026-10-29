@@ -127,6 +127,11 @@ input[type=number] { font-variant-numeric: tabular-nums; }
 .extras-tarifa tr:first-child td { border-top: 0; }
 .extras-tarifa td.precio { text-align: right; font-weight: 700; white-space: nowrap; }
 .extras-tarifa .como { display: block; font-size: 12.5px; opacity: .75; }
+.extras-tarifa .ayuda-extras { margin: -4px 0 8px; font-size: 13px; color: var(--muted); }
+.extras-tarifa label.marca { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-weight: 600; }
+.extras-tarifa label.marca input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--accent); }
+.extras-tarifa .valor { display: flex; gap: 8px; align-items: center; margin: 6px 0 0 30px; font-size: 13.5px; }
+.extras-tarifa .valor input { width: 120px; padding: 6px 8px; font: inherit; border: 1px solid var(--line); border-radius: 8px; text-align: right; }
 
 .contacto { background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 6px 24px; align-items: baseline; font-size: 15px; }
 .contacto strong { font-family: var(--f-display); }
@@ -324,8 +329,8 @@ footer p { margin: 0; }
     <h2 id="t-precio"><b>4</b>Precio</h2>
     <div class="etiqueta" id="etiqueta"></div>
     <div id="notaDest"></div>
-    <div class="opciones" id="opciones"></div>
     <div class="extras-tarifa" id="extrasTarifa" hidden></div>
+    <div class="opciones" id="opciones"></div>
     <p class="nota-agencia"><strong>Precios de la agencia TIPSA 018000 Granada Centro</strong> (Lopal 2010, S.L.). Otras agencias TIPSA pueden aplicar tarifas distintas.</p>
   </section>
 
@@ -622,21 +627,85 @@ footer p { margin: 0; }
     pintarExtras();
   }
 
+  /* ===== Otros servicios de la tarifa: el cliente los marca y se suman al precio =====
+     tipo: envio (€ por envío) · bulto (€ por bulto) · kg (€ por kg cobrado) · porte (% del porte)
+           valor (% del valor declarado) · info (solo se muestra). Para "porte" y "valor", minimo = importe mínimo. */
+  const extrasMarcados = new Set();
+  let valorDeclarado = 0;
+  const pct = n => n.toLocaleString("es-ES", { maximumFractionDigits: 2 }) + " %";
+  function listaExtras() {
+    return (E.general.extras || []).filter(x => x && (x.concepto || x.como || x.precio != null))
+      .map(x => Object.assign({ tipo: x.precio != null ? "envio" : "info" }, x));
+  }
+  function precioExtraTxt(x) {
+    if (x.precio == null) return "";
+    const p = Number(x.precio), m = Number(x.minimo) > 0 ? " (mín. " + eur(Number(x.minimo)) + ")" : "";
+    if (x.tipo === "bulto") return eur(p) + " por bulto";
+    if (x.tipo === "kg") return eur(p) + " por kg";
+    if (x.tipo === "porte") return pct(p) + " del porte" + m;
+    if (x.tipo === "valor") return pct(p) + " del valor declarado" + m;
+    return eur(p);
+  }
+  // Importe de un extra para un envío con n bultos, W kg y un porte de "porte" € (sin IVA)
+  function importeExtra(x, n, W, porte) {
+    const p = Number(x.precio) || 0, min = Number(x.minimo) || 0;
+    if (x.tipo === "bulto") return p * n;
+    if (x.tipo === "kg") return p * W;
+    if (x.tipo === "porte") return Math.max(min, porte * p / 100);
+    if (x.tipo === "valor") return Math.max(min, valorDeclarado * p / 100);
+    return p;
+  }
   function pintarExtras() {
     const caja = $("extrasTarifa");
-    const lista = (E.general.extras || []).filter(x => x && (x.concepto || x.como || x.precio != null));
+    const lista = listaExtras();
     caja.hidden = !lista.length;
     if (!lista.length) { caja.replaceChildren(); return; }
     const t = el("table");
-    lista.forEach(x => {
+    let hayMarcables = false;
+    lista.forEach((x, i) => {
       const tr = el("tr");
-      const c = el("td", "", x.concepto || "");
-      if (x.como) c.appendChild(el("span", "como", x.como));
+      const c = el("td");
+      const marcable = x.tipo !== "info" && x.precio != null;
+      if (marcable) {
+        hayMarcables = true;
+        const lab = el("label", "marca");
+        const chk = el("input"); chk.type = "checkbox"; chk.checked = extrasMarcados.has(i);
+        chk.addEventListener("change", () => { chk.checked ? extrasMarcados.add(i) : extrasMarcados.delete(i); pintarExtras(); calcular(); });
+        const txt = el("span", "", x.concepto || "");
+        if (x.como) txt.appendChild(el("span", "como", x.como));
+        lab.append(chk, txt);
+        c.appendChild(lab);
+        if (x.tipo === "valor" && extrasMarcados.has(i)) {
+          const v = el("label", "valor", "Valor de la mercancía (€):");
+          const inp = el("input"); inp.inputMode = "decimal"; inp.value = valorDeclarado ? String(valorDeclarado).replace(".", ",") : "";
+          inp.addEventListener("input", () => { valorDeclarado = Math.max(0, parseFloat(inp.value.replace(/\./g, "").replace(",", ".")) || 0); calcular(); });
+          v.appendChild(inp);
+          c.appendChild(v);
+        }
+      } else {
+        c.textContent = x.concepto || "";
+        if (x.como) c.appendChild(el("span", "como", x.como));
+      }
       tr.appendChild(c);
-      tr.appendChild(el("td", "precio", x.precio != null ? eur(Number(x.precio)) : ""));
+      tr.appendChild(el("td", "precio", precioExtraTxt(x)));
       t.appendChild(tr);
     });
-    caja.replaceChildren(el("h3", "", "Otros servicios y suplementos de tu tarifa (sin IVA)"), t);
+    caja.replaceChildren(el("h3", "", "Otros servicios y suplementos de tu tarifa (sin IVA)"));
+    if (hayMarcables) caja.appendChild(el("p", "ayuda-extras", "Marca los que quieras y se suman al precio de abajo."));
+    caja.appendChild(t);
+  }
+  // Suma a cada servicio los extras marcados
+  function aplicarExtras(lista, n, W) {
+    const todos = listaExtras();
+    const elegidos = [...extrasMarcados].map(i => todos[i]).filter(x => x && x.tipo !== "info" && x.precio != null);
+    if (!elegidos.length) return lista;
+    lista.forEach(op => {
+      const base = op.precio;
+      op.extras = elegidos.map(x => ({ concepto: x.concepto || "Suplemento", importe: Math.round(importeExtra(x, n, W, base) * 100) / 100 }));
+      op.extras.forEach(e => { op.precio += e.importe; op.notas.push("Incluye " + e.concepto + ": " + eur(e.importe) + " (sin IVA)."); });
+      if (elegidos.some(x => x.tipo === "valor") && !valorDeclarado) op.notas.push("Escribe el valor de la mercancía para calcular el seguro (ahora se aplica el mínimo).");
+    });
+    return lista.sort((a, b) => a.precio - b.precio);
   }
 
   function calcular() {
@@ -688,7 +757,7 @@ footer p { margin: 0; }
     if (bloqueo) { cont.appendChild(el("p", "alerta", "Hay un bulto que no se puede enviar por la red normal. Llámanos al 958 40 86 59 y te damos precio.")); pintarPedido(); return; }
 
     const avisos = [];
-    const lista = opciones(d, W, nIrreg, bs, total, avisos, o);
+    const lista = aplicarExtras(opciones(d, W, nIrreg, bs, total, avisos, o), n, W);
     ultimo = { o, d, bs: bs.filter(b => b.completo), W, lista, sinIva, IVA };
     pintarPedido();
     avisos.forEach(t => notaDest.appendChild(el("p", "nota-dest", t)));
@@ -720,6 +789,8 @@ footer p { margin: 0; }
       (b.largo && b.ancho && b.alto ? ", " + b.largo + "×" + b.ancho + "×" + b.alto + " cm" : "")));
     l.push("Peso a cobrar: " + u.W + " kg");
     if (op) l.push("Servicio: " + op.nombre + " – " + precioTxt(op, u));
+    if (op && op.extras && op.extras.length) l.push("Incluye: " + op.extras.map(e => e.concepto + " (" + eur(e.importe) + ")").join(", ") +
+      (valorDeclarado && op.extras.length ? " · Valor declarado: " + eur(valorDeclarado) : ""));
     l.push("");
     const nom = $("pedNombre").value.trim(), tel = $("pedTel").value.trim(), notas = $("pedNotas").value.trim();
     if (nom) l.push("Nombre: " + nom);
@@ -888,6 +959,7 @@ footer p { margin: 0; }
   function seleccionar(c) {
     sel = c && RAIZ.clientes[c] ? c : "";
     E = tarifaDe(sel);
+    extrasMarcados.clear();
     rellenarPaises(); actualizarCamposDestino(); pintarCabeceraCliente(); textosPie(); calcular();
     if (!$("admin").hidden) pintarPanel();
   }
