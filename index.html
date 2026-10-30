@@ -916,6 +916,10 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
       a.target = "_blank"; a.rel = "noopener";
       a.setAttribute("aria-disabled", String(!txt));
       if (txt) a.href = "https://wa.me/" + (t.length === 9 ? "34" + t : t) + "?text=" + encodeURIComponent(txt);
+      a.addEventListener("click", () => {
+        try { navigator.clipboard.writeText(textoPedido()); } catch (e) {}
+        $("pedEstado").textContent = "Si el chat de WhatsApp sale vacío, pulsa Pegar (Ctrl+V): el pedido ya está copiado.";
+      });
       return a;
     }));
     wa.hidden = !tels.length;
@@ -1076,8 +1080,11 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     if (!pedidoListo()) return;
     const t = String(E.general.whatsapp || "").split(/[,;\/\n]+/).map(x => x.replace(/\D/g, "")).filter(x => x.length >= 9)[0];
     if (!t) { $("albEstado").textContent = "No hay un WhatsApp de pedidos configurado: usa el email o copia el pedido."; return; }
-    window.open("https://wa.me/" + (t.length === 9 ? "34" + t : t) + "?text=" + encodeURIComponent(textoAlbaran()), "_blank", "noopener");
-    $("albEstado").textContent = "Se ha abierto WhatsApp con el pedido escrito: pulsa Enviar. Te contestamos para confirmar la recogida.";
+    const txt = textoAlbaran();
+    // Si WhatsApp ya estaba abierto a veces no recoge el texto: por eso además se copia, para pegarlo
+    try { navigator.clipboard.writeText(txt); } catch (e) {}
+    window.open("https://wa.me/" + (t.length === 9 ? "34" + t : t) + "?text=" + encodeURIComponent(txt), "_blank", "noopener");
+    $("albEstado").textContent = "Se ha abierto WhatsApp con el pedido escrito: pulsa Enviar. Si el chat sale vacío, pulsa Pegar (Ctrl+V): el pedido ya está copiado. Te contestamos para confirmar la recogida.";
   });
   $("albMail").addEventListener("click", () => {
     if (!pedidoListo()) return;
