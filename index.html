@@ -439,8 +439,8 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     <div class="cond-texto">
       <h3>Seguro de mercancías (elección obligatoria de una de las opciones)</h3>
       <ul>
-        <li><strong>Seguro reposición:</strong> la cobertura de responsabilidad para los casos de rotura y/o extravío será de hasta un máximo de 600 € por expedición, con una franquicia de 100 €. Por este concepto se cobrará un 5 % sobre la facturación total de los portes, con un mínimo de 0,50 €.</li>
-        <li><strong>Seguro de valor declarado a todo riesgo:</strong> con previa declaración de valor, para expediciones concretas, se cargará el 2 % del valor declarado, con una comisión mínima de 3,75 €.</li>
+        <li><strong>Seguro reposición:</strong> la cobertura de responsabilidad para los casos de rotura y/o extravío será de hasta un máximo de 600 € por expedición, con una franquicia de 100 €. Por este concepto se cobrará <span id="condSegP"></span>.</li>
+        <li><strong>Seguro de valor declarado a todo riesgo:</strong> con previa declaración de valor, para expediciones concretas, se cargará <span id="condSegV"></span>.</li>
       </ul>
       <h3>Mercancía no asegurable</h3>
       <p>Documentos o fotocopias de cualquier tipo; mercancías con insuficiencia de envase o embalaje; artículos peligrosos, sujetos a ADR, como, por ejemplo: corrosivos, inflamables, explosivos, venenosos, radioactivos, infecciosos, etc.</p>
@@ -504,10 +504,10 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
         <div class="alb-gen">
           <div class="alb-checks">
             <strong>Seguro</strong>
-            <label><input type="radio" name="aSeguro" id="aSeguroP" checked><span>Seguro de portes<br><small>5 % de los portes, mínimo 0,50 €</small></span></label>
-            <label><input type="radio" name="aSeguro" id="aSeguroV"><span>Seguro de valor declarado<br><small>2 % del valor, mínimo 3,75 €</small></span></label>
+            <label><input type="radio" name="aSeguro" id="aSeguroP" checked><span>Seguro de portes<br><small id="segPTxt"></small></span></label>
+            <label><input type="radio" name="aSeguro" id="aSeguroV"><span>Seguro de valor declarado<br><small id="segVTxt"></small></span></label>
             <p class="alb-nota" id="albSeguroImp"></p>
-            <label class="alb-sabado"><input type="checkbox" id="aSabado"> Entrega en sábado</label>
+            <label class="alb-sabado" id="filaSabado"><input type="checkbox" id="aSabado"><span>Entrega en sábado<br><small id="sabTxt"></small></span></label>
           </div>
           <div class="alb-importes">
             <label class="alb-fila">Reembolso (€)<input type="text" id="aReembolso" inputmode="decimal" placeholder="0,00"></label>
@@ -796,6 +796,9 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     $("condDivisor").textContent = E.general.divisor;
     $("condFnA").textContent = eur(E.general.irregular);
     $("condFnB").textContent = eur(suplementoB(E.general));
+    const lp = lineaPortes(), lv = lineaValor();
+    $("condSegP").textContent = lp.tipo === "porte" ? "un " + pct(Number(lp.precio)) + " sobre la facturación total de los portes" + (Number(lp.minimo) > 0 ? ", con un mínimo de " + eur(Number(lp.minimo)) : "") : precioExtraTxt(lp);
+    $("condSegV").textContent = lv.tipo === "valor" ? "el " + pct(Number(lv.precio)) + " del valor declarado" + (Number(lv.minimo) > 0 ? ", con una comisión mínima de " + eur(Number(lv.minimo)) : "") : precioExtraTxt(lv);
     $("volTxt").textContent = "Se cobra el mayor entre el peso real y el peso volumétrico (1 m³ = " + kgm3 + " kg, es decir largo × ancho × alto en cm ÷ " + E.general.divisor + "). Medidas máximas por bulto: 40 kg, 150 cm de largo y 250 cm sumando las tres medidas. Fuera de Norma A (hasta 50 kg, 175 cm de largo y 300 cm sumando): " + eur(E.general.irregular) + " por bulto. Fuera de Norma B (de 175 a 200 cm de largo): " + eur(suplementoB(E.general)) + " por bulto.";
     pintarExtras();
   }
@@ -1076,24 +1079,45 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
   // Seguro del envío (condiciones generales): por defecto el de portes; se cambia al marcar valor declarado
   const importeTxt = t => { const s = String(t).trim(); return Math.max(0, parseFloat(s.indexOf(",") >= 0 ? s.replace(/\./g, "").replace(",", ".") : s) || 0); };
   const conValor = () => $("aSeguroV").checked;
+  // Precios de la tarifa del cliente («Más líneas de precios» del Panel); si no los tiene, los de la Tarifa 2026
+  const RE_SABADO = /s[aá]bado/i, RE_SEG_VALOR = /valor/i, RE_SEG_PORTES = /seguro.*porte|porte.*seguro/i;
+  const lineaTarifa = (re, defecto) => listaExtras().find(x => re.test(x.concepto || "") && x.tipo !== "info" && x.precio != null) || defecto;
+  const lineaPortes = () => lineaTarifa(RE_SEG_PORTES, { tipo: "porte", precio: 5, minimo: 0.5 });
+  const lineaValor = () => lineaTarifa(RE_SEG_VALOR, { tipo: "valor", precio: 2, minimo: 3.75 });
+  const lineaSabado = () => lineaTarifa(RE_SABADO, { tipo: "envio", precio: 7, como: "Capitales de provincia peninsulares" });
+  const esDeAlbaran = e => RE_SABADO.test(e.concepto) || RE_SEG_VALOR.test(e.concepto) || RE_SEG_PORTES.test(e.concepto);
+  // El precio del servicio sin sábado ni seguro: esos se eligen en esta página y no pueden contarse dos veces
+  const baseAlb = () => (opAceptada.extras || []).filter(esDeAlbaran).reduce((t, e) => t - e.importe, opAceptada.precio);
+  function importeAlb(x, porte) {
+    const p = Number(x.precio) || 0, min = Number(x.minimo) || 0, u = uAceptado;
+    const r = x.tipo === "bulto" ? p * u.bs.reduce((t, b) => t + b.cant, 0) : x.tipo === "kg" ? p * u.W
+      : x.tipo === "porte" ? Math.max(min, porte * p / 100) : x.tipo === "valor" ? Math.max(min, importeTxt(va("aValor")) * p / 100) : p;
+    return Math.round(r * 100) / 100;
+  }
   function seguroAlb() {
-    const base = conValor() ? importeTxt(va("aValor")) * 2 / 100 : opAceptada.precio * 5 / 100;
-    const importe = Math.round(Math.max(conValor() ? 3.75 : 0.5, base) * 100) / 100;
-    return { nombre: conValor() ? "Seguro de valor declarado" : "Seguro de portes", importe, total: Math.round((opAceptada.precio + importe) * 100) / 100 };
+    const base = baseAlb();
+    const importe = importeAlb(conValor() ? lineaValor() : lineaPortes(), base);
+    const sabado = $("aSabado").checked ? importeAlb(lineaSabado(), base) : 0;
+    return { nombre: conValor() ? "Seguro de valor declarado" : "Seguro de portes", importe, sabado, base, total: Math.round((base + importe + sabado) * 100) / 100 };
   }
   function pintarResumenAlb() {
     const u = uAceptado, s = seguroAlb(), nB = u.bs.reduce((t, b) => t + b.cant, 0);
     $("fValor").hidden = !conValor();
     if (!conValor()) $("fValor").classList.remove("falta");
+    $("segPTxt").textContent = precioExtraTxt(lineaPortes());
+    $("segVTxt").textContent = precioExtraTxt(lineaValor());
+    const ls = lineaSabado();
+    $("sabTxt").textContent = "+ " + precioExtraTxt(ls) + (ls.como && !/servicio/i.test(ls.como) ? " · " + ls.como : "") + (s.sabado ? " = " + eur(s.sabado) + " sin IVA" : "");
     $("albSeguroImp").textContent = s.nombre + ": " + eur(s.importe) + " sin IVA" + (conValor() && !importeTxt(va("aValor")) ? " (mínimo; escribe el valor)" : "");
     $("albResumen").replaceChildren(dato("Servicio", opAceptada.nombre),
-      dato("Precio con seguro", u.sinIva ? eur(s.total) + " sin IVA" : eur(s.total * (1 + u.IVA)) + " IVA incl."),
+      dato(s.sabado ? "Precio con seguro y sábado" : "Precio con seguro", u.sinIva ? eur(s.total) + " sin IVA" : eur(s.total * (1 + u.IVA)) + " IVA incl."),
       dato("Origen", u.o.txt), dato("Destino", u.d.txt), dato("Bultos", String(nB)), dato("Peso a cobrar", u.W + " kg"));
   }
   ["aSeguroP", "aSeguroV"].forEach(id => $(id).addEventListener("change", () => {
     pintarResumenAlb();
     if (conValor()) $("aValor").focus();
   }));
+  $("aSabado").addEventListener("change", pintarResumenAlb);
   $("aValor").addEventListener("input", pintarResumenAlb);
 
   function abrirAlbaran(op) {
@@ -1106,6 +1130,14 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     if (!va("aOTel") && $("pedTel").value.trim()) $("aOTel").value = $("pedTel").value.trim();
     if (!va("aODir") && $("pedNotas").value.trim()) $("aODir").value = $("pedNotas").value.trim();
     if (!va("aValor") && valorDeclarado) $("aValor").value = String(valorDeclarado).replace(".", ",");
+    // Lo marcado arriba en la calculadora pasa a estas casillas. El sábado solo existe para destinos peninsulares
+    const marcados = (op.extras || []).map(e => e.concepto);
+    if (marcados.some(c => RE_SABADO.test(c))) $("aSabado").checked = true;
+    if (marcados.some(c => RE_SEG_VALOR.test(c))) $("aSeguroV").checked = true;
+    else if (marcados.some(c => RE_SEG_PORTES.test(c))) $("aSeguroP").checked = true;
+    const conSabado = u.d.tipo === "es";
+    $("filaSabado").hidden = !conSabado;
+    if (!conSabado) $("aSabado").checked = false;
     pintarResumenAlb();
     $("albMedidas").replaceChildren(...u.bs.map((b, i) => {
       const tr = el("tr");
@@ -1143,11 +1175,13 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
   function textoAlbaran() {
     const u = uAceptado, op = opAceptada;
     const l = ["PEDIDO DE ENVÍO – TIPSA Granada Centro", "",
-      "Servicio: " + op.nombre + " – " + precioTxt(op, u)];
-    if (op.extras && op.extras.length) l.push("Incluye: " + op.extras.map(e => e.concepto + " (" + eur(e.importe) + ")").join(", "));
+      "Servicio: " + op.nombre + " – " + precioTxt({ precio: baseAlb() }, u)];
+    const otros = (op.extras || []).filter(e => !esDeAlbaran(e));
+    if (otros.length) l.push("Incluye: " + otros.map(e => e.concepto + " (" + eur(e.importe) + ")").join(", "));
     const seg = seguroAlb();
     l.push(seg.nombre + (conValor() ? " (valor " + eur(importeTxt(va("aValor"))) + ")" : "") + ": " + eur(seg.importe) + " sin IVA");
-    l.push("Total con seguro: " + precioTxt({ precio: seg.total }, u));
+    if (seg.sabado) l.push("Entrega en sábado: " + eur(seg.sabado) + " sin IVA");
+    l.push("Total: " + precioTxt({ precio: seg.total }, u));
     if (sel && RAIZ.clientes[sel]) l.push("Tarifa: " + RAIZ.clientes[sel].nombre);
     const bloque = (p, titulo) => {
       l.push("", titulo);
@@ -1167,7 +1201,6 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     u.bs.forEach((b, i) => l.push("Bulto " + (i + 1) + ": " + (b.cant > 1 ? b.cant + " × " : "") + (b.peso ? kg(b.peso) : "") +
       (b.largo && b.ancho && b.alto ? ", " + b.largo + "×" + b.ancho + "×" + b.alto + " cm" : "")));
     l.push("Peso a cobrar: " + u.W + " kg");
-    if ($("aSabado").checked) l.push("Entrega en sábado");
     if (va("aReembolso")) l.push("Reembolso: " + va("aReembolso") + " €");
     if (va("aObs")) l.push("Observaciones: " + va("aObs"));
     l.push("", "(Pedido hecho con la calculadora de la agencia TIPSA 018000 Granada Centro)");
