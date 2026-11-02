@@ -38,6 +38,9 @@ button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--tape); outline-offset: 2px; }
 
+/* Aviso temporal de aplicación en pruebas */
+.aviso-pruebas { margin: 0; background: var(--warn-soft); color: var(--warn); border-left: 6px solid var(--tape); padding: 10px 14px; font-size: 15px; }
+
 /* Cabecera */
 header { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 12px solid var(--tape); }
 .cab-fila { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
@@ -195,6 +198,10 @@ footer p { margin: 0; }
 .alb-checks label { display: flex; gap: 8px; align-items: center; }
 .alb-checks input { width: 18px; height: 18px; accent-color: var(--tape); }
 .alb-checks small { color: var(--muted); }
+.alb-checks label { align-items: flex-start; }
+.alb-checks input { flex: none; margin: 1px 0 0; }
+.alb-checks .alb-nota { margin: 0 0 4px; font-weight: 600; color: var(--accent); }
+.alb-sabado { padding-top: 8px; border-top: 1px solid var(--line); }
 .alb-importes { display: grid; gap: 8px; }
 .alb-importes .alb-fila { grid-template-columns: 140px minmax(0, 1fr); }
 .alb-medidas table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
@@ -274,6 +281,7 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
 </style>
 
 <div class="wrap" id="app">
+  <p class="aviso-pruebas" role="status" hidden><strong>Aplicación en pruebas.</strong> Pueden existir errores. Si ves algo raro, llámanos al 958 40 86 59.</p>
   <header>
     <div class="cab-fila">
       <div>
@@ -480,6 +488,7 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
   <!-- Página de datos del envío (se abre al pulsar «Acepto este envío»), con el formato del albarán de TIPSA -->
   <div class="albaran" id="albaran" hidden role="dialog" aria-modal="true" aria-labelledby="albTitulo">
     <div class="alb-wrap">
+      <p class="aviso-pruebas" hidden><strong>Aplicación en pruebas.</strong> Pueden existir errores. Si ves algo raro, llámanos al 958 40 86 59.</p>
       <div class="alb-barra">
         <button type="button" class="alb-volver" id="albVolver">← Volver a la calculadora</button>
         <h2 id="albTitulo">Datos del envío</h2>
@@ -494,14 +503,15 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
         <h3 class="pestana">Datos generales</h3>
         <div class="alb-gen">
           <div class="alb-checks">
-            <label><input type="checkbox" id="aDebido"> Porte debido <small>(paga el destinatario)</small></label>
-            <label><input type="checkbox" id="aAcuse"> Acuse de recibo</label>
-            <label><input type="checkbox" id="aSabado"> Entrega en sábado</label>
-            <label><input type="checkbox" id="aRetorno"> Retorno</label>
+            <strong>Seguro</strong>
+            <label><input type="radio" name="aSeguro" id="aSeguroP" checked><span>Seguro de portes<br><small>5 % de los portes, mínimo 0,50 €</small></span></label>
+            <label><input type="radio" name="aSeguro" id="aSeguroV"><span>Seguro de valor declarado<br><small>2 % del valor, mínimo 3,75 €</small></span></label>
+            <p class="alb-nota" id="albSeguroImp"></p>
+            <label class="alb-sabado"><input type="checkbox" id="aSabado"> Entrega en sábado</label>
           </div>
           <div class="alb-importes">
             <label class="alb-fila">Reembolso (€)<input type="text" id="aReembolso" inputmode="decimal" placeholder="0,00"></label>
-            <label class="alb-fila">Valor declarado (€)<input type="text" id="aValor" inputmode="decimal" placeholder="0,00"></label>
+            <label class="alb-fila" id="fValor" hidden><span>Valor declarado (€) <b>*</b></span><input type="text" id="aValor" inputmode="decimal" placeholder="0,00"></label>
           </div>
           <div class="alb-medidas">
             <table><thead><tr><th>Bulto</th><th>Peso</th><th>Alto</th><th>Ancho</th><th>Largo</th></tr></thead><tbody id="albMedidas"></tbody></table>
@@ -1063,11 +1073,32 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     } catch (e) { /* sin conexión */ }
   }
 
+  // Seguro del envío (condiciones generales): por defecto el de portes; se cambia al marcar valor declarado
+  const importeTxt = t => { const s = String(t).trim(); return Math.max(0, parseFloat(s.indexOf(",") >= 0 ? s.replace(/\./g, "").replace(",", ".") : s) || 0); };
+  const conValor = () => $("aSeguroV").checked;
+  function seguroAlb() {
+    const base = conValor() ? importeTxt(va("aValor")) * 2 / 100 : opAceptada.precio * 5 / 100;
+    const importe = Math.round(Math.max(conValor() ? 3.75 : 0.5, base) * 100) / 100;
+    return { nombre: conValor() ? "Seguro de valor declarado" : "Seguro de portes", importe, total: Math.round((opAceptada.precio + importe) * 100) / 100 };
+  }
+  function pintarResumenAlb() {
+    const u = uAceptado, s = seguroAlb(), nB = u.bs.reduce((t, b) => t + b.cant, 0);
+    $("fValor").hidden = !conValor();
+    if (!conValor()) $("fValor").classList.remove("falta");
+    $("albSeguroImp").textContent = s.nombre + ": " + eur(s.importe) + " sin IVA" + (conValor() && !importeTxt(va("aValor")) ? " (mínimo; escribe el valor)" : "");
+    $("albResumen").replaceChildren(dato("Servicio", opAceptada.nombre),
+      dato("Precio con seguro", u.sinIva ? eur(s.total) + " sin IVA" : eur(s.total * (1 + u.IVA)) + " IVA incl."),
+      dato("Origen", u.o.txt), dato("Destino", u.d.txt), dato("Bultos", String(nB)), dato("Peso a cobrar", u.W + " kg"));
+  }
+  ["aSeguroP", "aSeguroV"].forEach(id => $(id).addEventListener("change", () => {
+    pintarResumenAlb();
+    if (conValor()) $("aValor").focus();
+  }));
+  $("aValor").addEventListener("input", pintarResumenAlb);
+
   function abrirAlbaran(op) {
     opAceptada = op; uAceptado = ultimo;
-    const u = ultimo, nB = u.bs.reduce((s, b) => s + b.cant, 0);
-    $("albResumen").replaceChildren(dato("Servicio", op.nombre), dato("Precio", u.sinIva ? eur(op.precio) + " sin IVA" : eur(op.precio * (1 + u.IVA)) + " IVA incl."),
-      dato("Origen", u.o.txt), dato("Destino", u.d.txt), dato("Bultos", String(nB)), dato("Peso a cobrar", u.W + " kg"));
+    const u = ultimo;
     // Lo que ya sabemos de la calculadora
     if (!va("aOCp") && u.o.cruzada && $("origCp").value) $("aOCp").value = $("origCp").value;
     if (!va("aDCp") && selPais.value === "es" && $("cp").value) $("aDCp").value = $("cp").value;
@@ -1075,6 +1106,7 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     if (!va("aOTel") && $("pedTel").value.trim()) $("aOTel").value = $("pedTel").value.trim();
     if (!va("aODir") && $("pedNotas").value.trim()) $("aODir").value = $("pedNotas").value.trim();
     if (!va("aValor") && valorDeclarado) $("aValor").value = String(valorDeclarado).replace(".", ",");
+    pintarResumenAlb();
     $("albMedidas").replaceChildren(...u.bs.map((b, i) => {
       const tr = el("tr");
       [(b.cant > 1 ? b.cant + " × " : "") + "#" + (i + 1), b.peso ? kg(b.peso) : "—", b.alto || "—", b.ancho || "—", b.largo || "—"].forEach(v => tr.appendChild(el("td", "", String(v))));
@@ -1099,6 +1131,9 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
       f.classList.toggle("falta", vacio);
       if (vacio) faltan.push((p === "O" ? "Origen: " : "Destino: ") + t);
     }));
+    const sinValor = conValor() && !importeTxt(va("aValor"));
+    $("fValor").classList.toggle("falta", sinValor);
+    if (sinValor) faltan.push("Datos generales: Valor declarado");
     return faltan;
   }
   function direccion(p) {
@@ -1110,6 +1145,9 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     const l = ["PEDIDO DE ENVÍO – TIPSA Granada Centro", "",
       "Servicio: " + op.nombre + " – " + precioTxt(op, u)];
     if (op.extras && op.extras.length) l.push("Incluye: " + op.extras.map(e => e.concepto + " (" + eur(e.importe) + ")").join(", "));
+    const seg = seguroAlb();
+    l.push(seg.nombre + (conValor() ? " (valor " + eur(importeTxt(va("aValor"))) + ")" : "") + ": " + eur(seg.importe) + " sin IVA");
+    l.push("Total con seguro: " + precioTxt({ precio: seg.total }, u));
     if (sel && RAIZ.clientes[sel]) l.push("Tarifa: " + RAIZ.clientes[sel].nombre);
     const bloque = (p, titulo) => {
       l.push("", titulo);
@@ -1129,10 +1167,8 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
     u.bs.forEach((b, i) => l.push("Bulto " + (i + 1) + ": " + (b.cant > 1 ? b.cant + " × " : "") + (b.peso ? kg(b.peso) : "") +
       (b.largo && b.ancho && b.alto ? ", " + b.largo + "×" + b.ancho + "×" + b.alto + " cm" : "")));
     l.push("Peso a cobrar: " + u.W + " kg");
-    const marcas = [["aDebido", "Porte debido"], ["aAcuse", "Acuse de recibo"], ["aSabado", "Entrega en sábado"], ["aRetorno", "Retorno"]].filter(([id]) => $(id).checked).map(x => x[1]);
-    if (marcas.length) l.push(marcas.join(" · "));
+    if ($("aSabado").checked) l.push("Entrega en sábado");
     if (va("aReembolso")) l.push("Reembolso: " + va("aReembolso") + " €");
-    if (va("aValor")) l.push("Valor declarado: " + va("aValor") + " €");
     if (va("aObs")) l.push("Observaciones: " + va("aObs"));
     l.push("", "(Pedido hecho con la calculadora de la agencia TIPSA 018000 Granada Centro)");
     return l.join("\n");
@@ -1481,6 +1517,9 @@ input[type=time] { background: var(--field); border: 1px solid var(--line); bord
   /* Al abrir, todo en blanco para que lo rellene el cliente */
   $("cp").value = ""; selProv.value = "";
   nuevoBulto({ cant: "" });
+  /* Aviso de aplicación en pruebas: se ve hasta el 1 de enero de 2027 incluido y se quita solo a partir de esta fecha */
+  const AVISO_PRUEBAS_HASTA = "2027-01-02";
+  if (new Date() < new Date(AVISO_PRUEBAS_HASTA + "T00:00:00")) document.querySelectorAll(".aviso-pruebas").forEach(a => { a.hidden = false; });
   actualizarCamposOrigen(); actualizarCamposDestino(); pintarCabeceraCliente(); textosPie(); calcular();
   activarPanel();
 })();
